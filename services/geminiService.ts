@@ -1,14 +1,15 @@
+
 import { GoogleGenAI, Schema, Type } from "@google/genai";
 import { SYSTEM_INSTRUCTION, SNAPSHOT_SCHEMA } from "../constants";
-import { LifeSnapshot, BriefingDoc } from "../types";
+import { LifeSnapshot } from "../types";
 
 // Initialize the client
-// NOTE: Process.env.API_KEY is injected by the environment.
 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
 // Models
-const MODEL_FLASH = 'gemini-3-flash-preview'; // Fast, for chat and keywords
-const MODEL_PRO = 'gemini-3-pro-preview'; // Smarter, for deep analysis
+const MODEL_FLASH = 'gemini-3-flash-preview'; 
+const MODEL_PRO = 'gemini-3-pro-preview';
+const MODEL_VEO = 'veo-3.1-fast-generate-preview';
 
 export const createChatSession = () => {
   return ai.chats.create({
@@ -24,7 +25,7 @@ export const extractKeywords = async (text: string): Promise<string[]> => {
   try {
     const response = await ai.models.generateContent({
       model: MODEL_FLASH,
-      contents: `Extract 3-5 abstract themes or emotional keywords from this text. Return ONLY a comma-separated list. Text: "${text}"`,
+      contents: `Extract 3-5 simple emotional keywords from this text. Return ONLY a comma-separated list. Text: "${text}"`,
     });
     const raw = response.text || "";
     return raw.split(',').map(s => s.trim()).filter(s => s.length > 0);
@@ -39,12 +40,13 @@ export const generateLifeSnapshot = async (conversationHistory: string): Promise
     const response = await ai.models.generateContent({
       model: MODEL_PRO,
       contents: `Analyze the following conversation and generate a 'Life Snapshot' JSON based on the schema. 
+      Keep language simple, human, and encouraging.
       
       Conversation:
       ${conversationHistory}`,
       config: {
         responseMimeType: "application/json",
-        responseSchema: SNAPSHOT_SCHEMA as unknown as Schema, // Type casting for compatibility
+        responseSchema: SNAPSHOT_SCHEMA as unknown as Schema, 
       },
     });
 
@@ -57,40 +59,41 @@ export const generateLifeSnapshot = async (conversationHistory: string): Promise
   }
 };
 
-export const generateBriefingDoc = async (snapshot: LifeSnapshot): Promise<BriefingDoc> => {
-  const schema = {
-    type: Type.OBJECT,
-    properties: {
-      seeker_context: { type: Type.STRING },
-      current_blockers: { type: Type.STRING },
-      attempted_solutions: { type: Type.STRING },
-      recommended_start_point: { type: Type.STRING }
+// Generate a visual "Vibe" video for the mentor
+export const generateMentorVideo = async (mentorName: string, specialty: string): Promise<string | null> => {
+  // Check for API Key selection for Veo
+  if (window.aistudio && window.aistudio.hasSelectedApiKey) {
+    const hasKey = await window.aistudio.hasSelectedApiKey();
+    if (!hasKey) {
+      await window.aistudio.openSelectKey();
     }
-  };
+    // Re-instantiate with potentially new key context if needed, though usually env var is handled.
+  }
 
-  const response = await ai.models.generateContent({
-    model: MODEL_PRO,
-    contents: `Act as a Scribe. Create a professional Briefing Document for a Mentor based on this user snapshot.
-    The goal is to save the Mentor time.
-    
-    Snapshot: ${JSON.stringify(snapshot)}`,
-    config: {
-      responseMimeType: "application/json",
-      responseSchema: schema,
+  try {
+    let operation = await ai.models.generateVideos({
+      model: MODEL_VEO,
+      prompt: `A professional, calming, cinematic shot of a modern office space representing ${specialty}. Warm lighting, inviting atmosphere. 4k resolution.`,
+      config: {
+        numberOfVideos: 1,
+        resolution: '720p',
+        aspectRatio: '16:9'
+      }
+    });
+
+    // Polling for video completion
+    while (!operation.done) {
+      await new Promise(resolve => setTimeout(resolve, 5000));
+      operation = await ai.operations.getVideosOperation({operation: operation});
     }
-  });
 
-  return JSON.parse(response.text || "{}");
-};
-
-export const analyzeDocument = async (docText: string, snapshot: LifeSnapshot): Promise<string> => {
-  const response = await ai.models.generateContent({
-    model: MODEL_PRO,
-    contents: `Compare the User's Life Snapshot with the uploaded document content.
-    Identify 1 alignment and 1 contradiction or gap.
-    
-    Snapshot: ${JSON.stringify(snapshot)}
-    Document Content: ${docText.substring(0, 10000)}... (truncated)`,
-  });
-  return response.text || "Analysis failed.";
+    const videoUri = operation.response?.generatedVideos?.[0]?.video?.uri;
+    if (videoUri) {
+      return `${videoUri}&key=${process.env.API_KEY}`;
+    }
+    return null;
+  } catch (e) {
+    console.error("Video generation failed", e);
+    return null;
+  }
 };

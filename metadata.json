@@ -1,5 +1,7 @@
 {
   "name": "The Clarity Architect",
   "description": "A human-centric guidance platform designed to move users from chaotic complexity to structured clarity through calm, intelligent interaction.",
-  "requestFramePermissions": []
+  "requestFramePermissions": [
+    "microphone"
+  ]
 }

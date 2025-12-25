@@ -1,4 +1,4 @@
-import { LifeSnapshot } from "./types";
+import { LifeSnapshot, Mentor } from "./types";
 
 export const SYSTEM_INSTRUCTION = `
 # ROLE & PURPOSE
@@ -128,7 +128,7 @@ export const SNAPSHOT_SCHEMA = {
   required: ["primary_theme", "the_bottleneck", "pattern_matrix", "energy_balance", "low_effort_action"]
 };
 
-export const MOCK_MENTORS = [
+export const MOCK_MENTORS: Mentor[] = [
   {
     id: 'm1',
     name: 'Sarah Chen',
@@ -151,4 +151,6 @@ export const MOCK_MENTORS = [
     type: 'Clarity Architect',
     tagline: 'Aligning values with action.',
     specialty: 'Holistic Life Design',
-    matchReason: '
+    matchReason: 'Best for general realignment.'
+  }
+];

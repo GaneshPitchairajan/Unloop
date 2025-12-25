@@ -1,10 +1,11 @@
+
 export enum AppState {
   ENTRY = 1,
   DISCOVERY = 2,
   INSIGHT = 3,
   MARKETPLACE = 4,
-  WORKSPACE = 5,
-  KNOWLEDGE = 6,
+  CONNECTION = 5,
+  BOOKING = 6,
   ETHICS = 7
 }
 
@@ -25,8 +26,8 @@ export interface LifeSnapshot {
   the_bottleneck: string;
   pattern_matrix: Pattern[];
   energy_balance: {
-    drains: number; // 1-10
-    gains: number; // 1-10
+    drains: number;
+    gains: number;
     description: string;
   };
   low_effort_action: string;
@@ -41,13 +42,17 @@ export interface Mentor {
   matchReason: string;
 }
 
-export interface BriefingDoc {
-  seeker_context: string;
-  current_blockers: string;
-  attempted_solutions: string;
-  recommended_start_point: string;
-}
-
 export interface AnalysisResult {
   keywords: string[];
+}
+
+// New Interface for a saved "Problem/Session"
+export interface SessionData {
+  id: string;
+  timestamp: number;
+  label: string; // usually the bottleneck or theme
+  history: Message[];
+  snapshot: LifeSnapshot;
+  selectedMentor?: Mentor;
+  bookedTime?: string;
 }
