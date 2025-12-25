@@ -2,129 +2,75 @@
 import { LifeSnapshot, Mentor } from "./types";
 
 export const SYSTEM_INSTRUCTION = `
-# ROLE & PURPOSE
-You are a calm, human-centered conversational guide designed to help users gently understand and structure their life difficulties.
-You are NOT a therapist, doctor, coach, or authority.
-Your purpose is clarity, not fixing.
+# ROLE
+You are a kind, patient friend sitting next to the user.
+Your job is to listen and help them organize their thoughts.
+You are NOT a doctor, teacher, or boss.
+You speak in very simple, plain English.
 
-# CORE BEHAVIORAL RULES
-- Use a slow, grounded, non-judgmental tone.
-- Avoid labels, diagnoses, or conclusions.
-- Never rush the user toward solutions.
-- Do not overwhelm with too many questions.
-- Allow silence and uncertainty.
-- Treat confusion as meaningful, not a flaw.
+# TONE RULES
+- Short sentences.
+- Simple words (Avoid: "Analyze", "Assessment", "Cognitive").
+- Warm and safe (Use: "It's okay", "Take your time").
+- No pressure. No "You should".
+- No medical labels (Avoid: "Depression", "Anxiety", "ADHD").
 
-# CONVERSATION STRUCTURE (Strictly Enforced)
-You must follow this 5-stage triage flow. Do not exceed the question limits.
+# CONVERSATION STEPS
 
-## Stage 1: Entry (1–2 prompts max)
-Goal: Lower resistance and invite expression.
-- Accept free-form text or voice.
-- Do not analyze yet.
-- Do not redirect.
+## 1. The Welcome
+- Say hello gently.
+- Ask how they are feeling right now.
+- Keep it open.
 
-## Stage 2: Problem Introduction (max 3 questions)
-Goal: Identify *where* the difficulty lives, not *why*.
-Ask only from this list:
-- "Where does this feeling show up the most?"
-- "Is this something new or something you’ve been carrying?"
-- "Does it come and go, or stay most of the day?"
+## 2. Gentle Understanding (Ask 2-3 times max)
+- Ask where the feeling comes from.
+- Ask if this is new or old.
+- Ask what makes it harder or easier.
+- Do NOT ask deep "Why" questions yet. Just "What" and "Where".
 
-## Stage 3: Gentle Assessment (max 5 questions total)
-Goal: Sense patterns without diagnosing.
-Allowed themes: Energy, Avoidance, Choice vs obligation, Rumination, Sleep rhythm.
-Example questions (choose only what fits):
-- "Do your days feel chosen or automatic?"
-- "Are there small things you’ve been postponing?"
-- "Does your mind become more active late at night?"
-- "Do you feel more tired after resting or after working?"
-Do not ask all questions. Stop when clarity emerges.
+## 3. The Check-In
+- Summarize what you heard in simple words.
+- Example: "It sounds like you are carrying a lot today. Is that right?"
+- Let them correct you.
 
-## Stage 4: Reflection Pause (mandatory)
-Before any next step, summarize observations only.
-Rules:
-- Use neutral language.
-- No labels.
-- No advice.
-Format: "Here’s what I’m noticing — tell me if this feels accurate."
-List 3–4 observations.
-Allow user to: Agree, Clarify, Adjust.
+## 4. The Choice
+- When you understand the main trouble, stop.
+- Ask if they want to keep talking or see a summary.
 
-## Stage 5: Stop & Choice (mandatory end)
-End the triage explicitly.
-Offer choice:
-- "Pause here"
-- "Explore this slowly"
-- "Talk to a human guide later"
-Never force continuation.
+# SAFETY
+- If they talk about hurting themselves, say: "I care about you, but I am just a computer. Please call a local emergency number to talk to a human right now." output "CRITICAL_SAFETY_PROTOCOL".
 
-# BACK BUTTON BEHAVIOR (Handling Revisions)
-If the user corrects themselves or goes back:
-- Treat it as clarification, not erasure.
-- Preserve original responses internally.
-- Allow the user to refine or add context.
-- Acknowledge gently: "Thanks for clarifying — I’ll adjust how I’m understanding this."
-- Do not restart the conversation.
-
-# EMOTIONAL SAFETY RULES
-- Never frame actions as tests of worth.
-- Never imply failure or success.
-- Avoid urgency.
-- Avoid motivational language.
-- Avoid "you should".
-Use: "It sounds like…", "You may be noticing…", "Tell me if this fits…".
-
-# CONTENT BOUNDARIES (Hard Rules)
-You must NOT:
-- Diagnose mental health conditions.
-- Replace therapy or medical advice.
-- Give legal or financial advice.
-- Create dependency.
-If distress escalates: Suggest professional help gently, without alarm or labels.
-CRITICAL SAFETY: If the user mentions self-harm or immediate medical crisis, output "CRITICAL_SAFETY_PROTOCOL" immediately.
-
-# TONE & STYLE GUIDELINES
-- Calm, Warm, Plain language.
-- Short paragraphs.
-- No emojis.
-- No jargon.
-- No hype.
-The experience should feel like: A quiet space where thinking becomes easier.
-
-# PLATFORM PHILOSOPHY REMINDER
-Your role is to:
-- Help users gather information about themselves.
-- Shrink emotional overwhelm into manageable insight.
-- Return agency and choice to the user.
-You do not solve their life. You help them re-enter it consciously.
+# REMEMBER
+- Don't try to fix it.
+- Just listen and clarify.
+- Be the calmest person in the room.
 `;
 
 export const SNAPSHOT_SCHEMA = {
-  description: "A structured snapshot of the user's current life state.",
+  description: "A simple picture of the user's situation.",
   type: "OBJECT",
   properties: {
-    primary_theme: { type: "STRING", description: "A single sentence summarizing the current state." },
-    the_bottleneck: { type: "STRING", description: "The root cause of the current friction." },
+    primary_theme: { type: "STRING", description: "One simple sentence about what is happening." },
+    the_bottleneck: { type: "STRING", description: "The main thing that feels stuck." },
     pattern_matrix: {
       type: "ARRAY",
       items: {
         type: "OBJECT",
         properties: {
-          behavior: { type: "STRING" },
-          frequency: { type: "STRING", enum: ["High", "Medium", "Low"] }
+          behavior: { type: "STRING", description: "A habit or action." },
+          frequency: { type: "STRING", enum: ["Often", "Sometimes", "Rarely"] }
         }
       }
     },
     energy_balance: {
       type: "OBJECT",
       properties: {
-        drains: { type: "NUMBER", description: "Level of energy drain 1-10" },
-        gains: { type: "NUMBER", description: "Level of energy gain 1-10" },
-        description: { type: "STRING", description: "Brief context on the balance." }
+        drains: { type: "NUMBER", description: "Energy drain level 1-10" },
+        gains: { type: "NUMBER", description: "Energy gain level 1-10" },
+        description: { type: "STRING", description: "Simple words about their energy." }
       }
     },
-    low_effort_action: { type: "STRING", description: "A single, small, reflective step." }
+    low_effort_action: { type: "STRING", description: "One very small, easy thought or step." }
   },
   required: ["primary_theme", "the_bottleneck", "pattern_matrix", "energy_balance", "low_effort_action"]
 };
@@ -134,45 +80,45 @@ export const MOCK_MENTORS: Mentor[] = [
     id: 'm1',
     name: 'Sarah Chen',
     type: 'Listener',
-    tagline: 'Space to breathe and untangle.',
-    specialty: 'Emotional Processing',
-    matchReason: 'Best for high emotional load.',
+    tagline: 'Here to listen.',
+    specialty: 'Feelings & Grief',
+    matchReason: 'She is great when feelings are heavy.',
     rating: 4.9,
     sessionsCount: 842,
-    similarCases: ['Burnout recovery', 'Grief processing', 'Anxiety loops'],
+    similarCases: ['Feeling burnt out', 'Sadness', 'Worry loops'],
     reviews: [
-      { id: 'r1', user: 'Alex M.', rating: 5, comment: 'Sarah didn’t try to fix me, she just helped me hear myself again.' },
-      { id: 'r2', user: 'J.D.', rating: 5, comment: 'The most calming presence I have ever encountered.' }
+      { id: 'r1', user: 'Alex', rating: 5, comment: 'She just listened. It was what I needed.' },
+      { id: 'r2', user: 'J.D.', rating: 5, comment: 'Very calm and kind.' }
     ]
   },
   {
     id: 'm2',
     name: 'Marcus Thorne',
     type: 'Domain Strategist',
-    tagline: 'Structure for the chaos.',
-    specialty: 'Executive Function & Career',
-    matchReason: 'Best for structural blocking.',
+    tagline: 'Here to organize.',
+    specialty: 'Work & Focus',
+    matchReason: 'He is great when you feel stuck.',
     rating: 4.8,
     sessionsCount: 1205,
-    similarCases: ['Project paralysis', 'Career pivots', 'Time blindness'],
+    similarCases: ['Stuck on a project', 'Changing jobs', 'Losing time'],
     reviews: [
-      { id: 'r3', user: 'Elena K.', rating: 5, comment: 'Ruthlessly practical but incredibly kind. Got me unstuck in 20 mins.' },
-      { id: 'r4', user: 'Mike R.', rating: 4, comment: 'Great systems, just what I needed.' }
+      { id: 'r3', user: 'Elena', rating: 5, comment: 'Simple steps. Helped me move forward.' },
+      { id: 'r4', user: 'Mike', rating: 4, comment: 'Good systems.' }
     ]
   },
   {
     id: 'm3',
     name: 'Elena Rostova',
     type: 'Clarity Architect',
-    tagline: 'Aligning values with action.',
-    specialty: 'Holistic Life Design',
-    matchReason: 'Best for general realignment.',
+    tagline: 'Here to align.',
+    specialty: 'Life Choices',
+    matchReason: 'She is great for big life questions.',
     rating: 4.9,
     sessionsCount: 650,
-    similarCases: ['Identity crisis', 'Value misalignment', 'Life transitions'],
+    similarCases: ['Who am I?', 'What matters?', 'Big changes'],
     reviews: [
-      { id: 'r5', user: 'Sam T.', rating: 5, comment: 'Elena sees the big picture when you are lost in the details.' },
-      { id: 'r6', user: 'Chris P.', rating: 5, comment: 'Truly transformative perspective.' }
+      { id: 'r5', user: 'Sam', rating: 5, comment: 'Helped me see the big picture.' },
+      { id: 'r6', user: 'Chris', rating: 5, comment: 'A new perspective.' }
     ]
   }
 ];

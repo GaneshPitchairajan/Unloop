@@ -205,8 +205,8 @@ const State2Discovery: React.FC<Props> = ({ chatHistory, onSendMessage, onTransi
       <div className="flex-1 flex flex-col h-full w-full relative">
         <header className="px-8 py-5 border-b border-slate-800 bg-slate-900/80 backdrop-blur-md flex justify-between items-center z-10 sticky top-0">
           <div>
-            <h2 className="text-xl font-semibold text-slate-100 tracking-tight">Discovery Space</h2>
-            <p className="text-xs text-slate-400 font-medium mt-0.5">Let's figure this out together</p>
+            <h2 className="text-xl font-semibold text-slate-100 tracking-tight">Our conversation</h2>
+            <p className="text-xs text-slate-400 font-medium mt-0.5">Safe space. No judgment.</p>
           </div>
           
           <div className="flex items-center gap-3">
@@ -224,13 +224,13 @@ const State2Discovery: React.FC<Props> = ({ chatHistory, onSendMessage, onTransi
               ) : isLive ? (
                 <>
                   <Activity size={18} className="animate-pulse" />
-                  <span>Live Active</span>
+                  <span>Live</span>
                   <X size={16} className="ml-1 opacity-50" />
                 </>
               ) : (
                 <>
                   <Mic size={18} />
-                  <span>Use Voice</span>
+                  <span>Speak</span>
                 </>
               )}
             </button>
@@ -276,7 +276,7 @@ const State2Discovery: React.FC<Props> = ({ chatHistory, onSendMessage, onTransi
           {isLive ? (
             <div className="max-w-3xl mx-auto h-14 flex items-center justify-center gap-3 text-slate-400 bg-slate-950 rounded-xl border border-dashed border-slate-700">
                <Activity className="animate-pulse text-indigo-500" size={20} />
-               <span className="text-sm font-medium">I'm listening... (Tap 'Live Active' to stop)</span>
+               <span className="text-sm font-medium">Listening... (Tap 'Live' to stop)</span>
             </div>
           ) : showOptions ? (
             <div className="max-w-3xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 bg-slate-900 p-6 rounded-2xl border border-indigo-900/50 shadow-sm animate-[fadeIn_0.5s_ease-out]">
@@ -285,8 +285,8 @@ const State2Discovery: React.FC<Props> = ({ chatHistory, onSendMessage, onTransi
                   <Sparkles size={24} />
                 </div>
                 <div>
-                  <h4 className="font-bold text-slate-100">Ready to move forward?</h4>
-                  <p className="text-sm text-slate-400">We can generate your profile or keep talking.</p>
+                  <h4 className="font-bold text-slate-100">Ready to see your picture?</h4>
+                  <p className="text-sm text-slate-400">We have a picture of what's going on.</p>
                 </div>
               </div>
               <div className="flex gap-3 w-full md:w-auto">
@@ -295,13 +295,13 @@ const State2Discovery: React.FC<Props> = ({ chatHistory, onSendMessage, onTransi
                   className="flex-1 md:flex-none px-6 py-3 bg-slate-800 border border-slate-700 text-slate-300 font-medium rounded-xl hover:bg-slate-700 hover:border-slate-600 transition-all flex items-center justify-center gap-2"
                 >
                   <MessageSquare size={16} />
-                  <span>Continue Chat</span>
+                  <span>Keep talking</span>
                 </button>
                 <button 
                   onClick={onTransition}
                   className="flex-1 md:flex-none px-8 py-3 bg-indigo-600 text-white font-medium rounded-xl hover:bg-indigo-500 shadow-lg shadow-indigo-900/40 transition-all flex items-center justify-center gap-2 transform hover:scale-105"
                 >
-                  <span>See My Profile</span>
+                  <span>See what we noticed</span>
                   <ArrowRight size={18} />
                 </button>
               </div>
@@ -312,7 +312,7 @@ const State2Discovery: React.FC<Props> = ({ chatHistory, onSendMessage, onTransi
                 type="text"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                placeholder="Type here..."
+                placeholder="Say what's on your mind..."
                 className="w-full py-4 pl-6 pr-14 bg-slate-950 border border-slate-700 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 text-slate-200 placeholder:text-slate-600 transition-all"
                 disabled={isProcessing}
                 autoFocus

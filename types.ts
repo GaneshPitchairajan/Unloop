@@ -67,4 +67,7 @@ export interface SessionData {
   snapshot: LifeSnapshot;
   selectedMentor?: Mentor;
   bookedTime?: string;
+  userMood?: string;
+  userPriority?: string;
+  userNotes?: string;
 }

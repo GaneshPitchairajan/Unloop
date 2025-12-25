@@ -3,13 +3,12 @@ import { GoogleGenAI, Schema, Type } from "@google/genai";
 import { SYSTEM_INSTRUCTION, SNAPSHOT_SCHEMA } from "../constants";
 import { LifeSnapshot } from "../types";
 
-// Initialize the client
+// Initialize the client for standard operations
 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
 // Models
 const MODEL_FLASH = 'gemini-3-flash-preview'; 
 const MODEL_PRO = 'gemini-3-pro-preview';
-const MODEL_VEO = 'veo-3.1-fast-generate-preview';
 
 export const createChatSession = () => {
   return ai.chats.create({
@@ -56,44 +55,5 @@ export const generateLifeSnapshot = async (conversationHistory: string): Promise
   } catch (error) {
     console.error("Snapshot generation failed", error);
     throw error;
-  }
-};
-
-// Generate a visual "Vibe" video for the mentor
-export const generateMentorVideo = async (mentorName: string, specialty: string): Promise<string | null> => {
-  // Check for API Key selection for Veo
-  if (window.aistudio && window.aistudio.hasSelectedApiKey) {
-    const hasKey = await window.aistudio.hasSelectedApiKey();
-    if (!hasKey) {
-      await window.aistudio.openSelectKey();
-    }
-    // Re-instantiate with potentially new key context if needed, though usually env var is handled.
-  }
-
-  try {
-    let operation = await ai.models.generateVideos({
-      model: MODEL_VEO,
-      prompt: `A professional, calming, cinematic shot of a modern office space representing ${specialty}. Warm lighting, inviting atmosphere. 4k resolution.`,
-      config: {
-        numberOfVideos: 1,
-        resolution: '720p',
-        aspectRatio: '16:9'
-      }
-    });
-
-    // Polling for video completion
-    while (!operation.done) {
-      await new Promise(resolve => setTimeout(resolve, 5000));
-      operation = await ai.operations.getVideosOperation({operation: operation});
-    }
-
-    const videoUri = operation.response?.generatedVideos?.[0]?.video?.uri;
-    if (videoUri) {
-      return `${videoUri}&key=${process.env.API_KEY}`;
-    }
-    return null;
-  } catch (e) {
-    console.error("Video generation failed", e);
-    return null;
   }
 };

@@ -23,6 +23,11 @@ const App: React.FC = () => {
   const [showBooking, setShowBooking] = useState(false);
   const [sessionLabel, setSessionLabel] = useState<string>(''); // Dynamic Label
   
+  // New User Inputs
+  const [userMood, setUserMood] = useState<string>('');
+  const [userPriority, setUserPriority] = useState<string>('');
+  const [userNotes, setUserNotes] = useState<string>('');
+  
   // Application State
   const [isProcessing, setIsProcessing] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -38,7 +43,7 @@ const App: React.FC = () => {
     }
   }, []);
 
-  // Save or Update Session when snapshot changes
+  // Save or Update Session when data changes
   useEffect(() => {
     if (snapshot && history.length > 0) {
       const sessionId = currentSessionId || Date.now().toString();
@@ -51,6 +56,9 @@ const App: React.FC = () => {
         history,
         snapshot,
         selectedMentor: selectedMentor || undefined,
+        userMood,
+        userPriority,
+        userNotes
       };
 
       setSessions(prev => {
@@ -64,7 +72,7 @@ const App: React.FC = () => {
       if (!currentSessionId) setCurrentSessionId(sessionId);
       if (!sessionLabel) setSessionLabel(snapshot.primary_theme);
     }
-  }, [snapshot, selectedMentor, history, sessionLabel]); 
+  }, [snapshot, selectedMentor, history, sessionLabel, userMood, userPriority, userNotes]); 
 
   const handleEntryComplete = async (text: string) => {
     // Start new session
@@ -73,6 +81,9 @@ const App: React.FC = () => {
     setSelectedMentor(null);
     setCurrentSessionId(null);
     setSessionLabel('');
+    setUserMood('');
+    setUserPriority('');
+    setUserNotes('');
     
     const initialMsg: Message = {
       id: Date.now().toString(),
@@ -146,15 +157,39 @@ const App: React.FC = () => {
     setSnapshot(session.snapshot);
     setSessionLabel(session.label);
     setSelectedMentor(session.selectedMentor || null);
+    setUserMood(session.userMood || '');
+    setUserPriority(session.userPriority || '');
+    setUserNotes(session.userNotes || '');
     
-    // Determine state based on data presence
-    if (session.selectedMentor) {
-      setState(AppState.CONNECTION);
-    } else if (session.snapshot) {
+    // Always open "Your Current Picture" (Insight) if data exists, regardless of mentor selection
+    if (session.snapshot) {
       setState(AppState.INSIGHT);
     } else {
       setState(AppState.DISCOVERY);
     }
+  };
+
+  const handleNewSession = () => {
+    // Reset everything to Entry state
+    setHistory([]);
+    setSnapshot(null);
+    setSelectedMentor(null);
+    setCurrentSessionId(null);
+    setSessionLabel('');
+    setUserMood('');
+    setUserPriority('');
+    setUserNotes('');
+    
+    // Make sure we create a fresh chat session for context
+    try {
+      const session = createChatSession();
+      setChatSession(session);
+    } catch (e) {
+      console.error("Failed to reset AI", e);
+    }
+
+    setState(AppState.ENTRY);
+    setIsMenuOpen(false);
   };
 
   const handleBookingComplete = (time: string) => {
@@ -197,6 +232,7 @@ const App: React.FC = () => {
         sessions={sessions}
         onLoadSession={handleLoadSession}
         onRenameSession={renameSession}
+        onNewSession={handleNewSession}
       />
 
       {state === AppState.ENTRY && (
@@ -219,6 +255,13 @@ const App: React.FC = () => {
           onRename={renameCurrentSession}
           onNext={() => setState(AppState.MARKETPLACE)}
           onBack={() => setState(AppState.DISCOVERY)}
+          // Pass new props
+          mood={userMood}
+          setMood={setUserMood}
+          priority={userPriority}
+          setPriority={setUserPriority}
+          notes={userNotes}
+          setNotes={setUserNotes}
         />
       )}
 

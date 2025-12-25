@@ -22,9 +22,9 @@ const State1Entry: React.FC<Props> = ({ onComplete }) => {
           <div className="inline-flex items-center justify-center p-3 bg-slate-900 border border-slate-800 rounded-2xl mb-2 shadow-lg shadow-indigo-900/10">
             <Sparkles className="text-indigo-400" size={32} />
           </div>
-          <h1 className="text-5xl font-semibold text-slate-100 tracking-tight">The Clarity Architect</h1>
+          <h1 className="text-5xl font-semibold text-slate-100 tracking-tight">Your Space</h1>
           <p className="text-slate-400 text-xl font-light max-w-lg mx-auto leading-relaxed">
-            Move from noise to signal. Describe your current state without labeling it.
+            It’s okay to not know where to start. Just say how things feel today.
           </p>
         </div>
 
@@ -34,7 +34,7 @@ const State1Entry: React.FC<Props> = ({ onComplete }) => {
             <textarea
               className="w-full p-8 text-2xl bg-slate-900 border border-slate-800 shadow-xl shadow-black/50 rounded-2xl focus:ring-2 focus:ring-indigo-500/40 focus:border-indigo-500/40 focus:outline-none resize-none text-slate-100 placeholder:text-slate-600 transition-all font-light"
               rows={4}
-              placeholder="Right now, my day feels..."
+              placeholder="How are things feeling today?"
               value={text}
               onChange={(e) => setText(e.target.value)}
               autoFocus
@@ -46,7 +46,7 @@ const State1Entry: React.FC<Props> = ({ onComplete }) => {
                 disabled={!text.trim()}
                 className="flex items-center gap-2 px-8 py-3 bg-indigo-600 text-white rounded-xl hover:bg-indigo-500 hover:shadow-lg hover:shadow-indigo-500/20 disabled:opacity-0 disabled:translate-y-2 transition-all duration-500 ease-out font-medium"
               >
-                <span>Begin</span>
+                <span>Start here</span>
                 <ArrowRight size={18} />
               </button>
             </div>

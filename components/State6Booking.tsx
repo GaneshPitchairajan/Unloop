@@ -19,7 +19,7 @@ const State6Booking: React.FC<Props> = ({ mentor, onClose }) => {
         
         {/* Header */}
         <div className="p-6 border-b border-slate-800 flex justify-between items-center bg-slate-900">
-          <h3 className="text-xl font-bold text-slate-100">Booking Session</h3>
+          <h3 className="text-xl font-bold text-slate-100">Pick a time</h3>
           <button onClick={onClose} className="text-slate-500 hover:text-slate-300 text-sm font-medium">
             Close
           </button>
@@ -29,7 +29,7 @@ const State6Booking: React.FC<Props> = ({ mentor, onClose }) => {
           {step === 'date' ? (
             <div className="space-y-8">
               <div>
-                <p className="text-slate-400 font-medium mb-4">Select a time with {mentor.name}</p>
+                <p className="text-slate-400 font-medium mb-4">When works for you?</p>
                 <div className="grid grid-cols-2 gap-4">
                   {times.map((t) => (
                     <button
@@ -52,7 +52,7 @@ const State6Booking: React.FC<Props> = ({ mentor, onClose }) => {
                 onClick={() => setStep('confirm')}
                 className="w-full py-4 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-500 disabled:opacity-50 disabled:translate-y-0 transition-all hover:-translate-y-1 shadow-lg shadow-indigo-900/50"
               >
-                Confirm Time
+                Save this time
               </button>
             </div>
           ) : (
@@ -61,9 +61,9 @@ const State6Booking: React.FC<Props> = ({ mentor, onClose }) => {
                 <CheckCircle size={40} />
               </div>
               <div>
-                <h2 className="text-2xl font-bold text-slate-100">You're Booked!</h2>
+                <h2 className="text-2xl font-bold text-slate-100">All set.</h2>
                 <p className="text-slate-400 mt-2">
-                  Session with {mentor.name} set for <br/> <span className="font-bold text-slate-200">Tomorrow at {selectedTime}</span>
+                  We saved a spot with {mentor.name} for <br/> <span className="font-bold text-slate-200">Tomorrow at {selectedTime}</span>
                 </p>
               </div>
 
@@ -82,7 +82,7 @@ const State6Booking: React.FC<Props> = ({ mentor, onClose }) => {
                 onClick={onClose}
                 className="w-full py-3 text-slate-500 font-medium hover:text-slate-300"
               >
-                Back to Dashboard
+                Go back
               </button>
             </div>
           )}

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, User, Clock, FileText, Calendar, ChevronRight, Edit2, Check } from 'lucide-react';
+import { X, User, Clock, FileText, Calendar, ChevronRight, Edit2, Check, Plus } from 'lucide-react';
 import { SessionData } from '../types';
 
 interface Props {
@@ -8,9 +8,10 @@ interface Props {
   sessions: SessionData[];
   onLoadSession: (session: SessionData) => void;
   onRenameSession: (id: string, newLabel: string) => void;
+  onNewSession: () => void;
 }
 
-const Menu: React.FC<Props> = ({ isOpen, onClose, sessions, onLoadSession, onRenameSession }) => {
+const Menu: React.FC<Props> = ({ isOpen, onClose, sessions, onLoadSession, onRenameSession, onNewSession }) => {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editValue, setEditValue] = useState('');
 
@@ -40,7 +41,7 @@ const Menu: React.FC<Props> = ({ isOpen, onClose, sessions, onLoadSession, onRen
       <div className={`fixed top-0 right-0 h-full w-80 bg-slate-900 shadow-2xl z-50 transform transition-transform duration-300 ease-in-out border-l border-slate-800 ${isOpen ? 'translate-x-0' : 'translate-x-full'}`}>
         <div className="p-6 h-full flex flex-col text-slate-100">
           <div className="flex justify-between items-center mb-8">
-            <h2 className="text-xl font-bold text-slate-100">Staging Area</h2>
+            <h2 className="text-xl font-bold text-slate-100">Your Space</h2>
             <button onClick={onClose} className="p-2 hover:bg-slate-800 rounded-full text-slate-400 hover:text-white transition-colors">
               <X size={20} />
             </button>
@@ -58,6 +59,16 @@ const Menu: React.FC<Props> = ({ isOpen, onClose, sessions, onLoadSession, onRen
           </div>
 
           <div className="flex-1 overflow-y-auto space-y-8">
+            
+            {/* New Conversation Button */}
+            <button 
+              onClick={onNewSession}
+              className="w-full py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-medium shadow-lg shadow-indigo-900/40 transition-all flex items-center justify-center gap-2 mb-2"
+            >
+              <Plus size={18} />
+              <span>New Conversation</span>
+            </button>
+
             {/* My Journeys / Problems */}
             <div>
               <h3 className="text-xs font-bold uppercase tracking-widest text-slate-500 mb-4 flex items-center gap-2">

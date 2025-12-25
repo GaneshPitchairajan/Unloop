@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { LifeSnapshot } from '../types';
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, Cell } from 'recharts';
-import { ArrowRight, Battery, Compass, Layers, Zap, ArrowLeft, Edit2, Check } from 'lucide-react';
+import { ArrowRight, Battery, Compass, Layers, Zap, ArrowLeft, Edit2, Check, BarChart2, Smile } from 'lucide-react';
 
 interface Props {
   data: LifeSnapshot;
@@ -9,9 +9,19 @@ interface Props {
   onBack: () => void;
   onRename: (newName: string) => void;
   currentLabel: string;
+  // New props for state management
+  mood: string;
+  setMood: (m: string) => void;
+  priority: string;
+  setPriority: (p: string) => void;
+  notes: string;
+  setNotes: (n: string) => void;
 }
 
-const State3Dashboard: React.FC<Props> = ({ data, onNext, onBack, onRename, currentLabel }) => {
+const State3Dashboard: React.FC<Props> = ({ 
+  data, onNext, onBack, onRename, currentLabel,
+  mood, setMood, priority, setPriority, notes, setNotes
+}) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editValue, setEditValue] = useState(currentLabel);
 
@@ -27,6 +37,9 @@ const State3Dashboard: React.FC<Props> = ({ data, onNext, onBack, onRename, curr
     setIsEditing(false);
   };
 
+  const MOODS = ['Neutral', 'Anxious', 'Frustrated', 'Hopeful', 'Calm', 'Overwhelmed', 'Focused'];
+  const PRIORITIES = ['Low', 'Medium', 'High', 'Critical'];
+
   return (
     <div className="min-h-screen bg-slate-950 p-6 md:p-12 fade-in overflow-y-auto text-slate-100">
       <div className="max-w-6xl mx-auto space-y-8">
@@ -34,15 +47,16 @@ const State3Dashboard: React.FC<Props> = ({ data, onNext, onBack, onRename, curr
           <div className="flex gap-6 items-start w-full">
             <button 
               onClick={onBack}
-              className="mt-1 p-3 bg-slate-900 rounded-full border border-slate-800 text-slate-400 hover:text-slate-100 hover:border-slate-600 transition-all shadow-sm"
-              title="Back to Conversation"
+              className="flex items-center gap-2 px-4 py-2 bg-slate-900 rounded-full border border-slate-800 text-slate-400 hover:text-slate-100 hover:border-slate-600 transition-all shadow-sm flex-shrink-0 group mt-1"
+              title="Back to conversation"
             >
-              <ArrowLeft size={20} />
+              <ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform" />
+              <span className="font-medium text-sm">Chat</span>
             </button>
             <div className="w-full">
               <div className="flex items-center gap-2 mb-2">
                 <Zap className="text-indigo-500 fill-indigo-500" size={20} />
-                <span className="text-xs font-bold text-indigo-400 uppercase tracking-widest">Your Clarity Profile</span>
+                <span className="text-xs font-bold text-indigo-400 uppercase tracking-widest">Your Current Picture</span>
               </div>
               
               {/* Editable Title Section */}
@@ -66,7 +80,7 @@ const State3Dashboard: React.FC<Props> = ({ data, onNext, onBack, onRename, curr
                     <button 
                       onClick={() => setIsEditing(true)}
                       className="text-slate-600 hover:text-indigo-400 opacity-0 group-hover:opacity-100 transition-all"
-                      title="Rename this problem"
+                      title="Change this name"
                     >
                       <Edit2 size={18} />
                     </button>
@@ -74,14 +88,14 @@ const State3Dashboard: React.FC<Props> = ({ data, onNext, onBack, onRename, curr
                 )}
               </div>
               
-              <p className="text-slate-400 mt-2 text-lg font-light">Here is a simple look at your current situation.</p>
+              <p className="text-slate-400 mt-2 text-lg font-light">Here is what we heard from you.</p>
             </div>
           </div>
           <button 
             onClick={onNext} 
             className="flex items-center gap-2 px-6 py-3 bg-indigo-600 text-white rounded-full font-medium hover:bg-indigo-500 shadow-lg shadow-indigo-900/50 transition-all hover:gap-3 whitespace-nowrap"
           >
-            <span>Find a Helper</span>
+            <span>Talk to someone</span>
             <ArrowRight size={18} />
           </button>
         </header>
@@ -96,16 +110,61 @@ const State3Dashboard: React.FC<Props> = ({ data, onNext, onBack, onRename, curr
                 <div className="p-2 bg-indigo-900/50 rounded-lg text-indigo-300">
                    <Compass size={24} />
                 </div>
-                <h3 className="font-bold uppercase tracking-wide text-xs text-indigo-300">What's Happening</h3>
+                <h3 className="font-bold uppercase tracking-wide text-xs text-indigo-300">The Main Theme</h3>
               </div>
               <p className="text-3xl font-light text-slate-100 leading-tight mb-8">
                 "{data.primary_theme}"
               </p>
               <div className="p-6 bg-slate-950/50 rounded-2xl border border-slate-800">
-                <h4 className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">The Main Hurdle</h4>
+                <h4 className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">What Feels Stuck</h4>
                 <p className="text-slate-200 font-medium text-lg">{data.the_bottleneck}</p>
               </div>
             </div>
+          </div>
+
+          {/* User Input & Context Section */}
+           <div className="bg-slate-900 p-8 rounded-3xl shadow-xl shadow-black/20 border border-slate-800 flex flex-col gap-6">
+             <div className="flex items-center gap-3 text-indigo-400">
+                <div className="p-2 bg-indigo-900/30 rounded-lg text-indigo-400">
+                  <Edit2 size={24} />
+                </div>
+                <h3 className="font-bold uppercase tracking-wide text-xs text-slate-200">Add More Detail</h3>
+              </div>
+              
+              <div className="space-y-4">
+                <div>
+                  <label className="text-xs font-bold text-slate-500 uppercase tracking-wide mb-1.5 block">How do you feel?</label>
+                  <select 
+                    value={mood} 
+                    onChange={(e) => setMood(e.target.value)}
+                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-slate-200 focus:outline-none focus:border-indigo-500 cursor-pointer"
+                  >
+                    <option value="" disabled>Select Mood...</option>
+                    {MOODS.map(m => <option key={m} value={m}>{m}</option>)}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="text-xs font-bold text-slate-500 uppercase tracking-wide mb-1.5 block">How urgent is this?</label>
+                  <select 
+                    value={priority} 
+                    onChange={(e) => setPriority(e.target.value)}
+                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-slate-200 focus:outline-none focus:border-indigo-500 cursor-pointer"
+                  >
+                    <option value="" disabled>Select Priority...</option>
+                    {PRIORITIES.map(p => <option key={p} value={p}>{p}</option>)}
+                  </select>
+                </div>
+              </div>
+
+               <div className="pt-2 border-t border-slate-800">
+                 <textarea
+                   value={notes}
+                   onChange={(e) => setNotes(e.target.value)}
+                   placeholder="Anything else you want to say?"
+                   className="w-full h-24 bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-200 focus:outline-none focus:border-indigo-500 resize-none placeholder:text-slate-600"
+                 />
+               </div>
           </div>
 
           {/* Energy Balance Chart */}
@@ -114,7 +173,7 @@ const State3Dashboard: React.FC<Props> = ({ data, onNext, onBack, onRename, curr
               <div className="p-2 bg-emerald-900/30 rounded-lg text-emerald-400">
                 <Battery size={24} />
               </div>
-              <h3 className="font-bold uppercase tracking-wide text-xs text-slate-200">Energy Levels</h3>
+              <h3 className="font-bold uppercase tracking-wide text-xs text-slate-200">Your Energy</h3>
             </div>
             <div className="h-48 w-full my-4">
               <ResponsiveContainer width="100%" height="100%">
@@ -137,30 +196,30 @@ const State3Dashboard: React.FC<Props> = ({ data, onNext, onBack, onRename, curr
           </div>
 
           {/* Pattern Matrix */}
-          <div className="bg-slate-900 p-8 rounded-3xl shadow-xl shadow-black/20 border border-slate-800">
+          <div className="col-span-1 md:col-span-2 bg-slate-900 p-8 rounded-3xl shadow-xl shadow-black/20 border border-slate-800">
             <div className="flex items-center gap-3 mb-8 text-amber-500">
               <div className="p-2 bg-amber-900/30 rounded-lg text-amber-500">
                 <Layers size={24} />
               </div>
-              <h3 className="font-bold uppercase tracking-wide text-xs text-slate-200">Your Habits</h3>
+              <h3 className="font-bold uppercase tracking-wide text-xs text-slate-200">Patterns</h3>
             </div>
-            <ul className="space-y-4">
-              {data.pattern_matrix.map((p, i) => (
-                <li key={i} className="flex justify-between items-center p-3 hover:bg-slate-800 rounded-xl transition-colors">
-                  <span className="text-slate-300 font-medium">{p.behavior}</span>
-                  <span className={`px-2.5 py-1 rounded-md text-xs font-bold 
-                    ${p.frequency === 'High' ? 'bg-amber-900/40 text-amber-400' : 'bg-slate-800 text-slate-500'}`}>
-                    {p.frequency}
-                  </span>
-                </li>
-              ))}
-            </ul>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {data.pattern_matrix.map((p, i) => (
+                    <div key={i} className="flex justify-between items-center p-4 bg-slate-950 rounded-xl border border-slate-800">
+                    <span className="text-slate-300 font-medium">{p.behavior}</span>
+                    <span className={`px-2.5 py-1 rounded-md text-xs font-bold 
+                        ${p.frequency === 'High' ? 'bg-amber-900/40 text-amber-400' : 'bg-slate-800 text-slate-500'}`}>
+                        {p.frequency}
+                    </span>
+                    </div>
+                ))}
+            </div>
           </div>
 
           {/* Low Effort Action */}
-          <div className="col-span-1 md:col-span-2 bg-slate-800 text-white p-10 rounded-3xl shadow-2xl shadow-black/40 relative overflow-hidden border border-slate-700">
+          <div className="col-span-1 md:col-span-3 bg-slate-800 text-white p-10 rounded-3xl shadow-2xl shadow-black/40 relative overflow-hidden border border-slate-700">
              <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/20 rounded-full blur-3xl -mr-10 -mt-10"></div>
-            <h3 className="font-bold uppercase tracking-widest text-xs text-indigo-300 mb-4 relative z-10">One Small Step</h3>
+            <h3 className="font-bold uppercase tracking-widest text-xs text-indigo-300 mb-4 relative z-10">One Small Thought</h3>
             <p className="text-2xl font-light leading-relaxed relative z-10 text-slate-100">
               "{data.low_effort_action}"
             </p>

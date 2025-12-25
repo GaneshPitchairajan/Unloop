@@ -28,14 +28,14 @@ const State4Marketplace: React.FC<Props> = ({ snapshot, onSelectMentor, onBack }
           <button 
             onClick={onBack}
             className="mt-1 p-3 bg-slate-900 rounded-full border border-slate-800 text-slate-400 hover:text-slate-100 hover:border-slate-600 transition-all shadow-sm h-fit"
-            title="Back to Dashboard"
+            title="Go back"
           >
             <ArrowLeft size={20} />
           </button>
           <div>
-            <h2 className="text-4xl font-semibold text-slate-100 tracking-tight">Choose Your Guide</h2>
+            <h2 className="text-4xl font-semibold text-slate-100 tracking-tight">People who can listen</h2>
             <p className="text-slate-400 mt-2 text-lg">
-              We found these people who can help with: <span className="text-indigo-400 font-semibold border-b-2 border-indigo-900">{snapshot.the_bottleneck}</span>
+              These guides understand what you are going through.
             </p>
           </div>
         </div>
@@ -70,7 +70,7 @@ const State4Marketplace: React.FC<Props> = ({ snapshot, onSelectMentor, onBack }
                 </div>
 
                 <div className="md:text-right pl-6 border-l border-slate-800 md:border-0 md:pl-0">
-                  <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Why them?</p>
+                  <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Why they fit</p>
                   <p className="text-slate-300 text-sm font-medium max-w-xs leading-relaxed">{mentor.matchReason}</p>
                 </div>
 
