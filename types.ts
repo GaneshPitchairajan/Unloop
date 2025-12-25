@@ -4,10 +4,14 @@ export enum AppState {
   ENTRY = 1,
   DISCOVERY = 2,
   INSIGHT = 3,
-  MARKETPLACE = 4,
-  CONNECTION = 5,
-  BOOKING = 6,
-  ETHICS = 7
+  MATCHING = 4,   // New: Analysis/Searching state
+  MARKETPLACE = 5,
+  MENTOR_PROFILE = 6, // New: Detailed mentor deep-dive
+  CONNECTION = 7,
+  BOOKING = 8,
+  ETHICS = 9,
+  API_KEY_SELECTION = 10,
+  APPOINTMENT_DETAILS = 11
 }
 
 export interface Message {
@@ -45,25 +49,26 @@ export interface Mentor {
   id: string;
   name: string;
   type: 'Listener' | 'Domain Strategist' | 'Clarity Architect';
+  category: 'Emotional' | 'Practical' | 'Strategic' | 'Legal/Financial' | 'Health';
   tagline: string;
   specialty: string;
+  approach: string; // How they help
   matchReason: string;
-  // New Stats
   rating: number;
   sessionsCount: number;
   similarCases: string[];
   reviews: Review[];
+  availability: string;
 }
 
 export interface AnalysisResult {
   keywords: string[];
 }
 
-// New Interface for a saved "Problem/Session"
 export interface SessionData {
   id: string;
   timestamp: number;
-  label: string; // usually the bottleneck or theme
+  label: string; 
   history: Message[];
   snapshot: LifeSnapshot;
   selectedMentor?: Mentor;
@@ -71,4 +76,5 @@ export interface SessionData {
   userMood?: string;
   userPriority?: string;
   userNotes?: string;
+  consentGiven?: boolean;
 }

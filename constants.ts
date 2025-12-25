@@ -10,54 +10,32 @@ You speak in very simple, plain English.
 
 # TONE RULES
 - Short sentences.
-- Simple words (Avoid: "Analyze", "Assessment", "Cognitive").
-- Warm and safe (Use: "It's okay", "Take your time").
-- No pressure. No "You should".
-- No medical labels (Avoid: "Depression", "Anxiety", "ADHD").
+- Simple words.
+- Warm and safe.
+- No pressure.
 
 # CONVERSATION STEPS
-
-## 1. The Welcome
-- Say hello gently.
-- Ask how they are feeling right now.
-- Keep it open.
-
-## 2. Gentle Understanding (Ask 2-3 times max)
-- Ask where the feeling comes from.
-- Ask if this is new or old.
-- Ask what makes it harder or easier.
-- Do NOT ask deep "Why" questions yet. Just "What" and "Where".
-
-## 3. The Check-In
-- Summarize what you heard in simple words.
-- Example: "It sounds like you are carrying a lot today. Is that right?"
-- Let them correct you.
-
-## 4. The Choice
-- When you understand the main trouble, stop.
-- Ask if they want to keep talking or see a summary.
+1. The Welcome: Ask how they feel.
+2. Gentle Understanding: Ask 2-3 clarifying questions.
+3. The Check-In: Summarize what you heard.
+4. The Choice: Ask if they want to see the "Life Snapshot" summary.
 
 # SAFETY
-- If they talk about hurting themselves, say: "I care about you, but I am just a computer. Please call a local emergency number to talk to a human right now." output "CRITICAL_SAFETY_PROTOCOL".
-
-# REMEMBER
-- Don't try to fix it.
-- Just listen and clarify.
-- Be the calmest person in the room.
+- If self-harm is mentioned, output "CRITICAL_SAFETY_PROTOCOL" and direct to emergency services.
 `;
 
 export const SNAPSHOT_SCHEMA = {
   description: "A simple picture of the user's situation.",
   type: "OBJECT",
   properties: {
-    primary_theme: { type: "STRING", description: "One simple sentence about what is happening." },
-    the_bottleneck: { type: "STRING", description: "The main thing that feels stuck." },
+    primary_theme: { type: "STRING" },
+    the_bottleneck: { type: "STRING" },
     pattern_matrix: {
       type: "ARRAY",
       items: {
         type: "OBJECT",
         properties: {
-          behavior: { type: "STRING", description: "A habit or action." },
+          behavior: { type: "STRING" },
           frequency: { type: "STRING", enum: ["Often", "Sometimes", "Rarely"] }
         }
       }
@@ -65,12 +43,12 @@ export const SNAPSHOT_SCHEMA = {
     energy_balance: {
       type: "OBJECT",
       properties: {
-        drains: { type: "NUMBER", description: "Energy drain level 1-10" },
-        gains: { type: "NUMBER", description: "Energy gain level 1-10" },
-        description: { type: "STRING", description: "Simple words about their energy." }
+        drains: { type: "NUMBER" },
+        gains: { type: "NUMBER" },
+        description: { type: "STRING" }
       }
     },
-    low_effort_action: { type: "STRING", description: "One very small, easy thought or step." }
+    low_effort_action: { type: "STRING" }
   },
   required: ["primary_theme", "the_bottleneck", "pattern_matrix", "energy_balance", "low_effort_action"]
 };
@@ -80,45 +58,85 @@ export const MOCK_MENTORS: Mentor[] = [
     id: 'm1',
     name: 'Sarah Chen',
     type: 'Listener',
-    tagline: 'Here to listen.',
-    specialty: 'Feelings & Grief',
-    matchReason: 'She is great when feelings are heavy.',
+    category: 'Emotional',
+    tagline: 'Providing a safe harbor for your feelings.',
+    specialty: 'Grief & Anxiety',
+    approach: 'Sarah uses active listening and somatic awareness to help you process heavy emotions without feeling overwhelmed.',
+    matchReason: 'Your current situation has a high emotional drain.',
     rating: 4.9,
     sessionsCount: 842,
-    similarCases: ['Feeling burnt out', 'Sadness', 'Worry loops'],
+    similarCases: ['Burnt out', 'Recent loss', 'Anxiety loops'],
+    availability: 'Available Today',
     reviews: [
-      { id: 'r1', user: 'Alex', rating: 5, comment: 'She just listened. It was what I needed.' },
-      { id: 'r2', user: 'J.D.', rating: 5, comment: 'Very calm and kind.' }
+      { id: 'r1', user: 'Alex', rating: 5, comment: 'She just listened. It was what I needed.' }
     ]
   },
   {
     id: 'm2',
     name: 'Marcus Thorne',
     type: 'Domain Strategist',
-    tagline: 'Here to organize.',
-    specialty: 'Work & Focus',
-    matchReason: 'He is great when you feel stuck.',
+    category: 'Practical',
+    tagline: 'Turning chaos into actionable systems.',
+    specialty: 'Productivity & Work',
+    approach: 'Marcus breaks down complex projects into micro-tasks, helping you overcome procrastination through structure.',
+    matchReason: 'You identified a specific bottleneck in your daily routine.',
     rating: 4.8,
     sessionsCount: 1205,
-    similarCases: ['Stuck on a project', 'Changing jobs', 'Losing time'],
+    similarCases: ['Stuck on project', 'Career pivot', 'Time management'],
+    availability: 'Next: tomorrow 10am',
     reviews: [
-      { id: 'r3', user: 'Elena', rating: 5, comment: 'Simple steps. Helped me move forward.' },
-      { id: 'r4', user: 'Mike', rating: 4, comment: 'Good systems.' }
+      { id: 'r3', user: 'Elena', rating: 5, comment: 'Simple steps. Helped me move forward.' }
     ]
   },
   {
     id: 'm3',
     name: 'Elena Rostova',
     type: 'Clarity Architect',
-    tagline: 'Here to align.',
-    specialty: 'Life Choices',
-    matchReason: 'She is great for big life questions.',
+    category: 'Strategic',
+    tagline: 'Designing the blueprint for your next chapter.',
+    specialty: 'Life Transitions',
+    approach: 'Elena looks at the "meta-patterns" of your life to help you align your actions with your core values.',
+    matchReason: 'Your themes suggest a need for high-level life reorganization.',
     rating: 4.9,
     sessionsCount: 650,
-    similarCases: ['Who am I?', 'What matters?', 'Big changes'],
+    similarCases: ['Identity crisis', 'Major move', 'Value alignment'],
+    availability: 'Booking for next week',
     reviews: [
-      { id: 'r5', user: 'Sam', rating: 5, comment: 'Helped me see the big picture.' },
-      { id: 'r6', user: 'Chris', rating: 5, comment: 'A new perspective.' }
+      { id: 'r5', user: 'Sam', rating: 5, comment: 'Helped me see the big picture.' }
+    ]
+  },
+  {
+    id: 'm4',
+    name: 'David Vane',
+    type: 'Domain Strategist',
+    category: 'Legal/Financial',
+    tagline: 'Practical guidance for life\'s complex paperwork.',
+    specialty: 'Financial Stress',
+    approach: 'David helps demystify the anxiety of financial and legal obligations through clear, non-judgmental explanations.',
+    matchReason: 'You mentioned external pressures that feel legally or financially heavy.',
+    rating: 4.7,
+    sessionsCount: 430,
+    similarCases: ['Debt management', 'Contract stress', 'Budgeting'],
+    availability: 'Available Today',
+    reviews: [
+      { id: 'r7', user: 'Mark', rating: 5, comment: 'He made the scary numbers feel manageable.' }
+    ]
+  },
+  {
+    id: 'm5',
+    name: 'Dr. Aris Thorne',
+    type: 'Clarity Architect',
+    category: 'Health',
+    tagline: 'Holistic alignment of mind and body.',
+    specialty: 'Physical Burnout',
+    approach: 'Aris focuses on the intersection of physical health and mental clarity, identifying where your body is holding stress.',
+    matchReason: 'Your energy balance shows severe physical and mental fatigue.',
+    rating: 5.0,
+    sessionsCount: 210,
+    similarCases: ['Chronic fatigue', 'Stress-related illness', 'Sleep optimization'],
+    availability: 'Limited slots',
+    reviews: [
+      { id: 'r9', user: 'Chloe', rating: 5, comment: 'A truly integrative approach.' }
     ]
   }
 ];

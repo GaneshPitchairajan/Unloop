@@ -9,9 +9,10 @@ interface Props {
   onLoadSession: (session: SessionData) => void;
   onRenameSession: (id: string, newLabel: string) => void;
   onNewSession: () => void;
+  onViewAppointment: (session: SessionData) => void;
 }
 
-const Menu: React.FC<Props> = ({ isOpen, onClose, sessions, onLoadSession, onRenameSession, onNewSession }) => {
+const Menu: React.FC<Props> = ({ isOpen, onClose, sessions, onLoadSession, onRenameSession, onNewSession, onViewAppointment }) => {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editValue, setEditValue] = useState('');
 
@@ -27,6 +28,11 @@ const Menu: React.FC<Props> = ({ isOpen, onClose, sessions, onLoadSession, onRen
       onRenameSession(id, editValue);
     }
     setEditingId(null);
+  };
+
+  const handleAppointmentClick = (session: SessionData) => {
+    onViewAppointment(session);
+    onClose(); // Close menu after navigating
   };
 
   return (
@@ -139,7 +145,11 @@ const Menu: React.FC<Props> = ({ isOpen, onClose, sessions, onLoadSession, onRen
                    <p className="text-sm text-slate-600 italic">No upcoming sessions.</p>
                 ) : (
                   sessions.filter(s => s.bookedTime && s.selectedMentor).map(session => (
-                    <div key={session.id + 'apt'} className="p-3 bg-emerald-900/10 rounded-xl border border-emerald-900/30">
+                    <div 
+                      key={session.id + 'apt'} 
+                      onClick={() => handleAppointmentClick(session)}
+                      className="p-3 bg-emerald-900/10 rounded-xl border border-emerald-900/30 hover:bg-emerald-900/20 cursor-pointer transition-colors"
+                    >
                       <p className="font-bold text-emerald-400 text-sm">{session.selectedMentor?.name}</p>
                       <div className="flex items-center gap-2 mt-1 text-emerald-600 text-xs">
                         <Clock size={12} />

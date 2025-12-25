@@ -116,6 +116,7 @@ const State2Discovery: React.FC<Props> = ({ chatHistory, onSendMessage, onTransi
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       setAudioStream(stream);
 
+      // Create GoogleGenAI instance just before making the API call
       const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
       
       const sessionPromise = ai.live.connect({
