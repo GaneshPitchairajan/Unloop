@@ -1,5 +1,6 @@
 
 export enum AppState {
+  LANDING = 0,
   ENTRY = 1,
   DISCOVERY = 2,
   INSIGHT = 3,

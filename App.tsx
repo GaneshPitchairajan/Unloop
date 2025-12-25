@@ -4,6 +4,7 @@ import { createChatSession, generateLifeSnapshot, runWithRetry } from './service
 import { Chat } from "@google/genai";
 import { Menu as MenuIcon } from 'lucide-react';
 
+import LandingPage from './components/LandingPage';
 import State1Entry from './components/State1Entry';
 import State2Discovery from './components/State2Discovery';
 import State3Dashboard from './components/State3Dashboard';
@@ -13,7 +14,8 @@ import State6Booking from './components/State6Booking';
 import Menu from './components/Menu';
 
 const App: React.FC = () => {
-  const [state, setState] = useState<AppState>(AppState.ENTRY);
+  // Initial state is now LANDING
+  const [state, setState] = useState<AppState>(AppState.LANDING);
   const [chatSession, setChatSession] = useState<Chat | null>(null);
   
   // Current Session State
@@ -230,8 +232,8 @@ const App: React.FC = () => {
 
   return (
     <div className="antialiased text-slate-100 bg-slate-950 min-h-screen relative">
-      {/* Menu Button (Visible except on Entry) */}
-      {state !== AppState.ENTRY && (
+      {/* Menu Button (Visible except on Landing and Entry) */}
+      {state !== AppState.LANDING && state !== AppState.ENTRY && (
         <button 
           onClick={() => setIsMenuOpen(true)}
           className="fixed top-5 right-6 z-30 p-2.5 bg-slate-900/80 backdrop-blur-md rounded-full shadow-lg border border-slate-700 hover:bg-slate-800 transition-all text-slate-300 hover:text-white"
@@ -248,6 +250,10 @@ const App: React.FC = () => {
         onRenameSession={renameSession}
         onNewSession={handleNewSession}
       />
+
+      {state === AppState.LANDING && (
+        <LandingPage onStart={() => setState(AppState.ENTRY)} />
+      )}
 
       {state === AppState.ENTRY && (
         <State1Entry onComplete={handleEntryComplete} />
