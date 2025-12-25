@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { AppState, Message, LifeSnapshot, Mentor, SessionData } from './types';
-import { createChatSession, generateLifeSnapshot } from './services/geminiService';
+import { createChatSession, generateLifeSnapshot, runWithRetry } from './services/geminiService';
 import { Chat } from "@google/genai";
 import { Menu as MenuIcon } from 'lucide-react';
 
@@ -101,7 +101,8 @@ const App: React.FC = () => {
     setIsProcessing(true);
 
     try {
-      const result = await chatSession.sendMessage({ message: text });
+      // Wrap the chat message in the retry logic
+      const result = await runWithRetry(() => chatSession.sendMessage({ message: text }));
       const responseText = result.text || "I'm listening.";
       
       if (responseText.includes("CRITICAL_SAFETY_PROTOCOL")) {
@@ -117,8 +118,20 @@ const App: React.FC = () => {
       };
 
       setHistory(prev => [...prev, aiMsg]);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Chat Error", error);
+      if (error?.status === 429 || error?.code === 429) {
+        alert("We are receiving too many requests right now. Please wait a moment and try again.");
+      } else {
+        // Fallback message in chat if standard error occurs
+        const errorMsg: Message = {
+          id: (Date.now() + 1).toString(),
+          role: 'model',
+          content: "I'm having a little trouble connecting right now. Could you say that again?",
+          timestamp: Date.now()
+        };
+        setHistory(prev => [...prev, errorMsg]);
+      }
     } finally {
       setIsProcessing(false);
     }
@@ -139,13 +152,14 @@ const App: React.FC = () => {
     setIsProcessing(true);
     try {
       const conversationBlock = history.map(m => `${m.role}: ${m.content}`).join('\n');
+      // generateLifeSnapshot already uses runWithRetry internally in geminiService.ts
       const data = await generateLifeSnapshot(conversationBlock);
       setSnapshot(data);
       setSessionLabel(data.primary_theme); // Default label
       setState(AppState.INSIGHT);
     } catch (e) {
       console.error("Analysis Failed", e);
-      alert("We couldn't generate the snapshot just yet. Please continue chatting a bit more.");
+      alert("We couldn't generate the picture just yet due to high traffic. Please try continuing the conversation.");
     } finally {
       setIsProcessing(false);
     }
