@@ -33,6 +33,13 @@ export interface LifeSnapshot {
   low_effort_action: string;
 }
 
+export interface Review {
+  id: string;
+  user: string;
+  comment: string;
+  rating: number;
+}
+
 export interface Mentor {
   id: string;
   name: string;
@@ -40,6 +47,11 @@ export interface Mentor {
   tagline: string;
   specialty: string;
   matchReason: string;
+  // New Stats
+  rating: number;
+  sessionsCount: number;
+  similarCases: string[];
+  reviews: Review[];
 }
 
 export interface AnalysisResult {

@@ -21,6 +21,7 @@ const App: React.FC = () => {
   const [snapshot, setSnapshot] = useState<LifeSnapshot | null>(null);
   const [selectedMentor, setSelectedMentor] = useState<Mentor | null>(null);
   const [showBooking, setShowBooking] = useState(false);
+  const [sessionLabel, setSessionLabel] = useState<string>(''); // Dynamic Label
   
   // Application State
   const [isProcessing, setIsProcessing] = useState(false);
@@ -41,11 +42,12 @@ const App: React.FC = () => {
   useEffect(() => {
     if (snapshot && history.length > 0) {
       const sessionId = currentSessionId || Date.now().toString();
+      const label = sessionLabel || snapshot.primary_theme;
       
       const sessionData: SessionData = {
         id: sessionId,
         timestamp: Date.now(),
-        label: snapshot.primary_theme,
+        label: label,
         history,
         snapshot,
         selectedMentor: selectedMentor || undefined,
@@ -60,8 +62,9 @@ const App: React.FC = () => {
       });
       
       if (!currentSessionId) setCurrentSessionId(sessionId);
+      if (!sessionLabel) setSessionLabel(snapshot.primary_theme);
     }
-  }, [snapshot, selectedMentor, history]); // Update whenever these change
+  }, [snapshot, selectedMentor, history, sessionLabel]); 
 
   const handleEntryComplete = async (text: string) => {
     // Start new session
@@ -69,6 +72,7 @@ const App: React.FC = () => {
     setSnapshot(null);
     setSelectedMentor(null);
     setCurrentSessionId(null);
+    setSessionLabel('');
     
     const initialMsg: Message = {
       id: Date.now().toString(),
@@ -126,6 +130,7 @@ const App: React.FC = () => {
       const conversationBlock = history.map(m => `${m.role}: ${m.content}`).join('\n');
       const data = await generateLifeSnapshot(conversationBlock);
       setSnapshot(data);
+      setSessionLabel(data.primary_theme); // Default label
       setState(AppState.INSIGHT);
     } catch (e) {
       console.error("Analysis Failed", e);
@@ -139,6 +144,7 @@ const App: React.FC = () => {
     setCurrentSessionId(session.id);
     setHistory(session.history);
     setSnapshot(session.snapshot);
+    setSessionLabel(session.label);
     setSelectedMentor(session.selectedMentor || null);
     
     // Determine state based on data presence
@@ -153,21 +159,35 @@ const App: React.FC = () => {
 
   const handleBookingComplete = (time: string) => {
     setShowBooking(false);
-    // Update session with booking info
     if (currentSessionId) {
        setSessions(prev => prev.map(s => s.id === currentSessionId ? { ...s, bookedTime: time } : s));
     }
   };
+  
+  // Renaming logic
+  const renameSession = (id: string, newLabel: string) => {
+    setSessions(prev => prev.map(s => s.id === id ? { ...s, label: newLabel } : s));
+    if (currentSessionId === id) {
+      setSessionLabel(newLabel);
+    }
+  };
+
+  const renameCurrentSession = (newLabel: string) => {
+    setSessionLabel(newLabel);
+    if (currentSessionId) {
+      renameSession(currentSessionId, newLabel);
+    }
+  };
 
   return (
-    <div className="antialiased text-stone-800 relative">
+    <div className="antialiased text-slate-100 bg-slate-950 min-h-screen relative">
       {/* Menu Button (Visible except on Entry) */}
       {state !== AppState.ENTRY && (
         <button 
           onClick={() => setIsMenuOpen(true)}
-          className="fixed top-5 right-6 z-30 p-2.5 bg-white/80 backdrop-blur-md rounded-full shadow-sm hover:bg-white border border-slate-200 transition-all"
+          className="fixed top-5 right-6 z-30 p-2.5 bg-slate-900/80 backdrop-blur-md rounded-full shadow-lg border border-slate-700 hover:bg-slate-800 transition-all text-slate-300 hover:text-white"
         >
-          <MenuIcon size={24} className="text-slate-700" />
+          <MenuIcon size={24} />
         </button>
       )}
 
@@ -176,6 +196,7 @@ const App: React.FC = () => {
         onClose={() => setIsMenuOpen(false)} 
         sessions={sessions}
         onLoadSession={handleLoadSession}
+        onRenameSession={renameSession}
       />
 
       {state === AppState.ENTRY && (
@@ -194,6 +215,8 @@ const App: React.FC = () => {
       {state === AppState.INSIGHT && snapshot && (
         <State3Dashboard 
           data={snapshot}
+          currentLabel={sessionLabel}
+          onRename={renameCurrentSession}
           onNext={() => setState(AppState.MARKETPLACE)}
           onBack={() => setState(AppState.DISCOVERY)}
         />

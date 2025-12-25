@@ -1,3 +1,4 @@
+
 import { LifeSnapshot, Mentor } from "./types";
 
 export const SYSTEM_INSTRUCTION = `
@@ -135,7 +136,14 @@ export const MOCK_MENTORS: Mentor[] = [
     type: 'Listener',
     tagline: 'Space to breathe and untangle.',
     specialty: 'Emotional Processing',
-    matchReason: 'Best for high emotional load.'
+    matchReason: 'Best for high emotional load.',
+    rating: 4.9,
+    sessionsCount: 842,
+    similarCases: ['Burnout recovery', 'Grief processing', 'Anxiety loops'],
+    reviews: [
+      { id: 'r1', user: 'Alex M.', rating: 5, comment: 'Sarah didn’t try to fix me, she just helped me hear myself again.' },
+      { id: 'r2', user: 'J.D.', rating: 5, comment: 'The most calming presence I have ever encountered.' }
+    ]
   },
   {
     id: 'm2',
@@ -143,7 +151,14 @@ export const MOCK_MENTORS: Mentor[] = [
     type: 'Domain Strategist',
     tagline: 'Structure for the chaos.',
     specialty: 'Executive Function & Career',
-    matchReason: 'Best for structural blocking.'
+    matchReason: 'Best for structural blocking.',
+    rating: 4.8,
+    sessionsCount: 1205,
+    similarCases: ['Project paralysis', 'Career pivots', 'Time blindness'],
+    reviews: [
+      { id: 'r3', user: 'Elena K.', rating: 5, comment: 'Ruthlessly practical but incredibly kind. Got me unstuck in 20 mins.' },
+      { id: 'r4', user: 'Mike R.', rating: 4, comment: 'Great systems, just what I needed.' }
+    ]
   },
   {
     id: 'm3',
@@ -151,6 +166,13 @@ export const MOCK_MENTORS: Mentor[] = [
     type: 'Clarity Architect',
     tagline: 'Aligning values with action.',
     specialty: 'Holistic Life Design',
-    matchReason: 'Best for general realignment.'
+    matchReason: 'Best for general realignment.',
+    rating: 4.9,
+    sessionsCount: 650,
+    similarCases: ['Identity crisis', 'Value misalignment', 'Life transitions'],
+    reviews: [
+      { id: 'r5', user: 'Sam T.', rating: 5, comment: 'Elena sees the big picture when you are lost in the details.' },
+      { id: 'r6', user: 'Chris P.', rating: 5, comment: 'Truly transformative perspective.' }
+    ]
   }
 ];
