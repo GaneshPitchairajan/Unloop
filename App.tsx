@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { AppState, Message, LifeSnapshot, Mentor, SessionData } from './types';
 import { createChatSession, generateLifeSnapshot, runWithRetry } from './services/geminiService';
@@ -36,13 +37,22 @@ const App: React.FC = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [sessions, setSessions] = useState<SessionData[]>(() => {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    return saved ? JSON.parse(saved) : [];
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      return saved ? JSON.parse(saved) : [];
+    } catch (e) {
+      console.error("Failed to parse sessions from storage", e);
+      return [];
+    }
   });
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
 
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(sessions));
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(sessions));
+    } catch (e) {
+      console.error("Failed to save sessions to storage", e);
+    }
   }, [sessions]);
 
   useEffect(() => {
@@ -51,7 +61,9 @@ const App: React.FC = () => {
         const session = createChatSession();
         setChatSession(session);
       } catch (e) {
-        setState(AppState.API_KEY_SELECTION);
+        console.error("Failed to init AI session", e);
+        // Only transition to key selection if it's explicitly a missing key error
+        // Otherwise, it might be a temporary init error
       }
     }
   }, [state]);
@@ -85,38 +97,52 @@ const App: React.FC = () => {
   }, [snapshot, selectedMentor, history, sessionLabel, userMood, userPriority, userNotes, currentSessionId]); 
 
   const handleEntryComplete = async (text: string) => {
-    const hasKey = await window.aistudio.hasSelectedApiKey();
-    if (!hasKey) {
-      setState(AppState.API_KEY_SELECTION);
-      return;
-    }
-
-    const newId = Date.now().toString();
-    setCurrentSessionId(newId);
-    setHistory([]);
-    setSnapshot(null);
-    setSelectedMentor(null);
-    setSessionLabel('');
-    setUserMood('');
-    setUserPriority('');
-    setUserNotes('');
-    
     try {
-      setChatSession(createChatSession());
-    } catch (e) {
-      setState(AppState.API_KEY_SELECTION);
-      return;
-    }
+      // Check for AI Studio API safely. If missing, assume API_KEY is provided via env
+      if (window.aistudio && typeof window.aistudio.hasSelectedApiKey === 'function') {
+        const hasKey = await window.aistudio.hasSelectedApiKey();
+        if (!hasKey) {
+          setState(AppState.API_KEY_SELECTION);
+          return;
+        }
+      }
 
-    const initialMsg: Message = { id: Date.now().toString(), role: 'user', content: text, timestamp: Date.now() };
-    setHistory([initialMsg]);
-    setState(AppState.DISCOVERY);
-    await processMessage(text);
+      const newId = Date.now().toString();
+      setCurrentSessionId(newId);
+      setHistory([]);
+      setSnapshot(null);
+      setSelectedMentor(null);
+      setSessionLabel('');
+      setUserMood('');
+      setUserPriority('');
+      setUserNotes('');
+      
+      try {
+        setChatSession(createChatSession());
+      } catch (e) {
+        console.error("Failed to create chat session", e);
+        // Fallback or retry logic could go here
+      }
+
+      const initialMsg: Message = { id: Date.now().toString(), role: 'user', content: text, timestamp: Date.now() };
+      setHistory([initialMsg]);
+      setState(AppState.DISCOVERY);
+      await processMessage(text);
+    } catch (err) {
+      console.error("Critical error in handleEntryComplete", err);
+      // Ensure the UI doesn't just hang
+      alert("Something went wrong starting your session. Please try again.");
+    }
   };
 
   const processMessage = async (text: string) => {
     if (!chatSession) {
-      try { setChatSession(createChatSession()); } catch (e) { setState(AppState.API_KEY_SELECTION); return; }
+      try { 
+        setChatSession(createChatSession()); 
+      } catch (e) { 
+        console.error("Re-init session failed", e);
+        return; 
+      }
     }
     setIsProcessing(true);
 
@@ -132,9 +158,11 @@ const App: React.FC = () => {
       const aiMsg: Message = { id: (Date.now() + 1).toString(), role: 'model', content: responseText, timestamp: Date.now() };
       setHistory(prev => [...prev, aiMsg]);
     } catch (error: any) {
+      console.error("Process message error", error);
       const isQuotaError = error?.status === 429 || error?.code === 429;
-      if (isQuotaError) setState(AppState.API_KEY_SELECTION);
-      else {
+      if (isQuotaError && window.aistudio) {
+        setState(AppState.API_KEY_SELECTION);
+      } else {
         setHistory(prev => [...prev, { id: Date.now().toString(), role: 'model', content: "Connection hiccup. Say again?", timestamp: Date.now() }]);
       }
     } finally {
@@ -156,8 +184,9 @@ const App: React.FC = () => {
       if (!sessionLabel) setSessionLabel(data.primary_theme);
       setState(AppState.INSIGHT);
     } catch (e: any) {
+      console.error("Transition to insight failed", e);
       const isQuotaError = e?.status === 429 || e?.code === 429;
-      if (isQuotaError) setState(AppState.API_KEY_SELECTION);
+      if (isQuotaError && window.aistudio) setState(AppState.API_KEY_SELECTION);
       else alert("Snapshot failed. Keep chatting.");
     } finally {
       setIsProcessing(false);
@@ -180,18 +209,31 @@ const App: React.FC = () => {
   };
 
   const handleNewSession = async () => {
-    const hasKey = await window.aistudio.hasSelectedApiKey();
-    if (!hasKey) { setState(AppState.API_KEY_SELECTION); setIsMenuOpen(false); return; }
-    setCurrentSessionId(null);
-    setHistory([]);
-    setSnapshot(null);
-    setSelectedMentor(null);
-    setSessionLabel('');
-    setUserMood('');
-    setUserPriority('');
-    setUserNotes('');
-    setState(AppState.ENTRY);
-    setIsMenuOpen(false);
+    try {
+      if (window.aistudio && typeof window.aistudio.hasSelectedApiKey === 'function') {
+        const hasKey = await window.aistudio.hasSelectedApiKey();
+        if (!hasKey) { 
+          setState(AppState.API_KEY_SELECTION); 
+          setIsMenuOpen(false); 
+          return; 
+        }
+      }
+      
+      setCurrentSessionId(null);
+      setHistory([]);
+      setSnapshot(null);
+      setSelectedMentor(null);
+      setSessionLabel('');
+      setUserMood('');
+      setUserPriority('');
+      setUserNotes('');
+      setState(AppState.ENTRY);
+      setIsMenuOpen(false);
+    } catch (e) {
+      console.error("New session failed", e);
+      setState(AppState.ENTRY);
+      setIsMenuOpen(false);
+    }
   };
 
   const handleBookingComplete = (time: string, consent: boolean) => {
