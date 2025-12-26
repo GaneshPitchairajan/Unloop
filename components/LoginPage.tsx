@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { User } from '../types';
-import { LogIn, Sparkles, UserPlus, Fingerprint, Lock, Mail } from 'lucide-react';
+import { LogIn, Sparkles, UserPlus, Fingerprint, Lock, Mail, Command } from 'lucide-react';
 
 interface Props {
   onLogin: (user: User) => void;
@@ -43,7 +43,7 @@ const LoginPage: React.FC<Props> = ({ onLogin, allUsers }) => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col md:flex-row bg-slate-950 overflow-hidden">
+    <div className="min-h-screen flex flex-col md:flex-row bg-slate-950 overflow-hidden page-transition">
       {/* Branding Section */}
       <div className="md:w-1/2 bg-slate-900 flex flex-col items-center justify-center p-12 relative overflow-hidden">
         <div className="absolute top-[-10%] left-[-10%] w-[60%] h-[60%] bg-indigo-600/10 rounded-full blur-[120px]"></div>
@@ -51,22 +51,22 @@ const LoginPage: React.FC<Props> = ({ onLogin, allUsers }) => {
         
         <div className="relative z-10 text-center space-y-8 max-w-sm">
           <div className="w-24 h-24 bg-indigo-600 rounded-3xl mx-auto flex items-center justify-center shadow-2xl shadow-indigo-600/20 animate-pulse">
-            <Fingerprint className="text-white" size={48} />
+            <Command className="text-white" size={48} />
           </div>
           <div className="space-y-4">
-            <h1 className="text-5xl font-bold tracking-tighter text-white">Unloop Your Potential.</h1>
+            <h1 className="text-5xl font-black tracking-tighter text-white">UnLOOP</h1>
             <p className="text-slate-400 text-lg leading-relaxed font-light">
-              "Clarity is not the absence of chaos, but the mastery of it."
+              "Resolution is the mastery of complexity. Secure your space now."
             </p>
           </div>
-          <div className="pt-8 border-t border-slate-800 grid grid-cols-2 gap-4 text-xs font-bold uppercase tracking-widest text-indigo-400">
+          <div className="pt-8 border-t border-slate-800 grid grid-cols-2 gap-4 text-xs font-black uppercase tracking-widest text-indigo-400">
             <div className="flex flex-col gap-2">
               <Sparkles size={16} className="mx-auto" />
               <span>Calm Logic</span>
             </div>
             <div className="flex flex-col gap-2">
               <Lock size={16} className="mx-auto" />
-              <span>Private Space</span>
+              <span>Resolution Space</span>
             </div>
           </div>
         </div>
@@ -76,42 +76,42 @@ const LoginPage: React.FC<Props> = ({ onLogin, allUsers }) => {
       <div className="md:w-1/2 flex items-center justify-center p-8 bg-slate-950">
         <div className="w-full max-w-md space-y-10">
           <div className="space-y-2 text-center md:text-left">
-            <h2 className="text-3xl font-bold text-white">
-              {isRegistering ? 'Create your space' : 'Welcome back'}
+            <h2 className="text-4xl font-black text-white tracking-tight">
+              {isRegistering ? 'Initialize Resolution' : 'Enter Sanctuary'}
             </h2>
             <p className="text-slate-500 font-medium">
-              {isRegistering ? 'Start your journey to structured clarity.' : 'Your sanctuary is waiting.'}
+              {isRegistering ? 'Your journey to structural clarity begins here.' : 'Re-enter your unlooping process.'}
             </p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="space-y-4">
+            <div className="space-y-5">
               {isRegistering && (
-                <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Full Name</label>
-                  <div className="relative">
-                    <LogIn className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-600" size={18} />
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Identity Name</label>
+                  <div className="relative group">
+                    <LogIn className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-600 group-focus-within:text-indigo-500 transition-colors" size={18} />
                     <input 
                       type="text" 
                       value={name}
                       onChange={(e) => setName(e.target.value)}
-                      placeholder="Jane Doe"
-                      className="w-full bg-slate-900 border border-slate-800 rounded-2xl py-4 pl-12 pr-4 text-white focus:outline-none focus:border-indigo-500 transition-all placeholder:text-slate-700"
+                      placeholder="Your Name"
+                      className="w-full bg-slate-900 border border-slate-800 rounded-2xl py-5 pl-14 pr-4 text-white focus:outline-none focus:border-indigo-500 transition-all placeholder:text-slate-700"
                       required
                     />
                   </div>
                 </div>
               )}
-              <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Email Address</label>
-                <div className="relative">
-                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-600" size={18} />
+              <div className="space-y-2">
+                <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Secure Email</label>
+                <div className="relative group">
+                  <Mail className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-600 group-focus-within:text-indigo-500 transition-colors" size={18} />
                   <input 
                     type="email" 
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="jane@example.com"
-                    className="w-full bg-slate-900 border border-slate-800 rounded-2xl py-4 pl-12 pr-4 text-white focus:outline-none focus:border-indigo-500 transition-all placeholder:text-slate-700"
+                    placeholder="email@unloop.com"
+                    className="w-full bg-slate-900 border border-slate-800 rounded-2xl py-5 pl-14 pr-4 text-white focus:outline-none focus:border-indigo-500 transition-all placeholder:text-slate-700"
                     required
                   />
                 </div>
@@ -120,9 +120,9 @@ const LoginPage: React.FC<Props> = ({ onLogin, allUsers }) => {
 
             <button 
               type="submit"
-              className="w-full py-4 bg-indigo-600 text-white font-bold rounded-2xl hover:bg-indigo-500 shadow-xl shadow-indigo-900/20 transition-all flex items-center justify-center gap-3 active:scale-[0.98]"
+              className="unloop-button unloop-glow w-full py-5 bg-indigo-600 text-white font-black rounded-2xl hover:bg-indigo-500 shadow-xl shadow-indigo-900/30 transition-all flex items-center justify-center gap-3 active:scale-[0.98] uppercase tracking-widest text-sm"
             >
-              <span>{isRegistering ? 'Initialize Space' : 'Enter Sanctuary'}</span>
+              <span>{isRegistering ? 'Initialize UnLOOP Space' : 'Enter My Resolution Sanctuary'}</span>
               <Sparkles size={18} />
             </button>
           </form>
@@ -130,10 +130,9 @@ const LoginPage: React.FC<Props> = ({ onLogin, allUsers }) => {
           <div className="text-center">
             <button 
               onClick={() => setIsRegistering(!isRegistering)}
-              className="text-slate-500 hover:text-indigo-400 text-sm font-medium transition-colors inline-flex items-center gap-2"
+              className="text-slate-500 hover:text-indigo-400 text-xs font-black uppercase tracking-widest transition-colors inline-flex items-center gap-2"
             >
-              {isRegistering ? <LogIn size={14}/> : <UserPlus size={14}/>}
-              {isRegistering ? 'Already have an account? Login' : 'First time here? Create an account'}
+              {isRegistering ? 'Already have a space? Secure Login' : 'First loop? Initialize Resolution Space'}
             </button>
           </div>
         </div>

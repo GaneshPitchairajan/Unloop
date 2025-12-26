@@ -1,8 +1,7 @@
 
 import React, { useState, useMemo } from 'react';
-import { User, Mentor, SessionData, LifeSnapshot } from '../types';
-// Added missing 'Save' icon to the lucide-react imports
-import { ArrowLeft, ShieldCheck, Sparkles, Check, Info, Edit3, Calendar, Clock, FileText, User as UserIcon, X, Eye, ChevronRight, Mail, Phone, Globe, Save } from 'lucide-react';
+import { User, Mentor, SessionData } from '../types';
+import { ArrowLeft, ShieldCheck, Check, Edit3, Calendar, Clock, FileText, User as UserIcon, X, Eye, ChevronRight, MessageSquare, Send, Command } from 'lucide-react';
 
 interface Props {
   user: User;
@@ -54,11 +53,8 @@ const MentorDashboard: React.FC<Props> = ({ user, allSessions, onUpdateProfile, 
   const handleToggleMentor = () => {
     const newStatus = !isMentor;
     setIsMentor(newStatus);
-    if (!newStatus) {
-      onUpdateProfile(null);
-    } else {
-      onUpdateProfile({ ...profile, id: user.id } as Mentor);
-    }
+    if (!newStatus) onUpdateProfile(null);
+    else onUpdateProfile({ ...profile, id: user.id } as Mentor);
   };
 
   const handleSave = (e: React.FormEvent) => {
@@ -74,85 +70,81 @@ const MentorDashboard: React.FC<Props> = ({ user, allSessions, onUpdateProfile, 
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 p-6 md:p-12 fade-in text-slate-100 overflow-y-auto relative">
-      <div className="max-w-6xl mx-auto space-y-8">
-        <header className="flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-slate-800 pb-8">
-           <div className="flex items-center gap-4">
-              <button onClick={onBack} className="p-3 bg-slate-900 rounded-full border border-slate-800 text-slate-400 hover:text-white transition-all shadow-lg">
+    <div className="min-h-screen bg-paper p-8 md:p-16 page-arrival text-charcoal overflow-y-auto">
+      <div className="max-w-6xl mx-auto space-y-12">
+        <header className="flex flex-col md:flex-row md:items-center justify-between gap-10 border-b border-slate-100 pb-12">
+           <div className="flex items-center gap-5">
+              <button onClick={onBack} className="p-4 bg-white rounded-full calm-shadow border border-slate-50 text-slate-300 hover:text-calm-500 transition-all">
                 <ArrowLeft size={20} />
               </button>
-              <div>
-                 <h1 className="text-3xl font-bold tracking-tight">Mentor Hub</h1>
-                 <p className="text-slate-400 font-light mt-1">Manage your identity and guides.</p>
+              <div className="space-y-1">
+                 <div className="flex items-center gap-2 text-calm-300">
+                   <Command size={14} />
+                   <span className="text-[10px] font-semibold uppercase tracking-[0.3em]">UnLOOP Hub</span>
+                 </div>
+                 <h1 className="text-3xl font-medium tracking-tight">Guide dashboard</h1>
               </div>
            </div>
 
-           <div className="flex bg-slate-900 p-1.5 rounded-2xl border border-slate-800 self-start md:self-auto flex-wrap">
-              <button onClick={() => setActiveTab('schedule')} className={`px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-widest transition-all flex items-center gap-2 ${activeTab === 'schedule' ? 'bg-indigo-600 text-white shadow-lg' : 'text-slate-500 hover:text-slate-300'}`}><Calendar size={14} /> Schedule</button>
-              <button onClick={() => setActiveTab('mentees')} className={`px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-widest transition-all flex items-center gap-2 ${activeTab === 'mentees' ? 'bg-indigo-600 text-white shadow-lg' : 'text-slate-500 hover:text-slate-300'}`}><UserIcon size={14} /> Mentees</button>
-              <button onClick={() => setActiveTab('profile')} className={`px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-widest transition-all flex items-center gap-2 ${activeTab === 'profile' ? 'bg-indigo-600 text-white shadow-lg' : 'text-slate-500 hover:text-slate-300'}`}><Edit3 size={14} /> My Profile</button>
+           <div className="flex bg-white p-1.5 rounded-full calm-shadow border border-slate-50 self-start md:self-auto overflow-x-auto no-scrollbar">
+              <button onClick={() => setActiveTab('schedule')} className={`px-6 py-2.5 rounded-full text-xs font-medium transition-all flex items-center gap-2 whitespace-nowrap ${activeTab === 'schedule' ? 'bg-calm-500 text-white shadow-sm' : 'text-slate-400 hover:text-calm-500'}`}>Schedule</button>
+              <button onClick={() => setActiveTab('mentees')} className={`px-6 py-2.5 rounded-full text-xs font-medium transition-all flex items-center gap-2 whitespace-nowrap ${activeTab === 'mentees' ? 'bg-calm-500 text-white shadow-sm' : 'text-slate-400 hover:text-calm-500'}`}>Mentees</button>
+              <button onClick={() => setActiveTab('profile')} className={`px-6 py-2.5 rounded-full text-xs font-medium transition-all flex items-center gap-2 whitespace-nowrap ${activeTab === 'profile' ? 'bg-calm-500 text-white shadow-sm' : 'text-slate-400 hover:text-calm-500'}`}>Identity</button>
            </div>
         </header>
 
         {activeTab === 'profile' && (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
-            <div className="space-y-6">
-                <div className={`p-8 rounded-3xl border transition-all duration-500 flex flex-col items-center text-center space-y-4 ${isMentor ? 'bg-indigo-900/20 border-indigo-500/50' : 'bg-slate-900 border-slate-800 opacity-60'}`}>
-                  <div className={`w-16 h-16 rounded-2xl flex items-center justify-center ${isMentor ? 'bg-indigo-600 text-white shadow-xl shadow-indigo-600/30' : 'bg-slate-800 text-slate-600'}`}><ShieldCheck size={32} /></div>
-                  <div>
-                      <h3 className="text-lg font-bold">{isMentor ? 'Active Mentor' : 'Mentor Inactive'}</h3>
-                      <p className="text-xs text-slate-500 mt-1 uppercase tracking-widest font-bold">Visibility Status</p>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+            <div className="space-y-8">
+                <div className={`p-10 rounded-[40px] border transition-all duration-700 flex flex-col items-center text-center space-y-6 ${isMentor ? 'bg-white border-calm-100 calm-shadow' : 'bg-white/50 border-slate-50 opacity-60'}`}>
+                  <div className={`w-16 h-16 rounded-3xl flex items-center justify-center ${isMentor ? 'bg-calm-50 text-calm-500 border border-calm-100' : 'bg-paper text-slate-200 border border-slate-50'}`}>
+                    <ShieldCheck size={32} />
                   </div>
-                  <button onClick={handleToggleMentor} className={`w-full py-3 rounded-xl font-bold transition-all ${isMentor ? 'bg-rose-900/20 text-rose-400 hover:bg-rose-900/40' : 'bg-indigo-600 text-white hover:bg-indigo-500'}`}>{isMentor ? 'Deactivate Profile' : 'Activate Profile'}</button>
+                  <div>
+                      <h3 className="text-xl font-medium">{isMentor ? 'Guide active' : 'Guide inactive'}</h3>
+                      <p className="text-[10px] text-slate-400 mt-1 uppercase tracking-widest font-semibold">Visibility status</p>
+                  </div>
+                  <button onClick={handleToggleMentor} className={`w-full py-4 rounded-full font-medium transition-all text-sm ${isMentor ? 'bg-paper text-slate-400 hover:text-rose-500' : 'bg-calm-500 text-white hover:bg-calm-600'}`}>{isMentor ? 'Deactivate identity' : 'Activate identity'}</button>
                 </div>
             </div>
 
-            <div className="md:col-span-2">
+            <div className="lg:col-span-2">
                 {!isMentor ? (
-                  <div className="h-full flex flex-col items-center justify-center p-12 text-center border-2 border-dashed border-slate-800 rounded-3xl space-y-6">
-                    <div className="p-4 bg-slate-900 rounded-full text-slate-500"><Sparkles size={40} /></div>
-                    <h4 className="text-xl font-bold">Start your guide journey.</h4>
-                    <button onClick={handleToggleMentor} className="px-8 py-3 bg-indigo-600 text-white rounded-xl font-bold">Start Mentoring</button>
+                  <div className="h-full flex flex-col items-center justify-center p-20 text-center border-2 border-dashed border-slate-100 rounded-[40px] space-y-6">
+                    <p className="text-slate-400 font-light max-w-xs">Start your journey as a guide and help others unloop their complexity.</p>
+                    <button onClick={handleToggleMentor} className="px-10 py-4 bg-calm-500 text-white rounded-full font-medium text-sm">Become a guide</button>
                   </div>
                 ) : (
-                  <form onSubmit={handleSave} className="bg-slate-900 p-8 rounded-3xl border border-slate-800 space-y-8 relative">
-                    <div className="flex items-center gap-3 pb-4 border-b border-slate-800">
-                        <Edit3 size={20} className="text-indigo-400" />
-                        <h3 className="font-bold text-lg text-slate-100">Public Information & Contact</h3>
+                  <form onSubmit={handleSave} className="bg-white p-12 rounded-[40px] border border-slate-50 calm-shadow space-y-12">
+                    <div className="space-y-1.5 border-b border-slate-50 pb-4 flex items-center gap-3">
+                        <Edit3 size={18} className="text-calm-300" />
+                        <h3 className="font-medium text-lg">Public profile details</h3>
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                        <div className="space-y-1.5">
-                          <label className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Display Name</label>
-                          <input type="text" value={profile.name} onChange={e => setProfile({...profile, name: e.target.value})} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-indigo-500" required />
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div className="space-y-3">
+                          <label className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest">Display name</label>
+                          <input type="text" value={profile.name} onChange={e => setProfile({...profile, name: e.target.value})} className="w-full bg-paper border border-slate-50 rounded-2xl px-5 py-4 text-charcoal focus:outline-none focus:border-calm-200 text-sm font-light" required />
                         </div>
-                        <div className="space-y-1.5">
-                          <label className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Email</label>
-                          <input type="email" value={profile.email} onChange={e => setProfile({...profile, email: e.target.value})} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-indigo-500" />
-                        </div>
-                        <div className="space-y-1.5">
-                          <label className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Phone</label>
-                          <input type="text" value={profile.phone} onChange={e => setProfile({...profile, phone: e.target.value})} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-indigo-500" placeholder="+1..." />
-                        </div>
-                        <div className="space-y-1.5">
-                          <label className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Portfolio/Social</label>
-                          <input type="text" value={profile.socialLink} onChange={e => setProfile({...profile, socialLink: e.target.value})} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-indigo-500" placeholder="https://..." />
+                        <div className="space-y-3">
+                          <label className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest">Secure email</label>
+                          <input type="email" value={profile.email} onChange={e => setProfile({...profile, email: e.target.value})} className="w-full bg-paper border border-slate-50 rounded-2xl px-5 py-4 text-charcoal focus:outline-none focus:border-calm-200 text-sm font-light" />
                         </div>
                     </div>
 
-                    <div className="space-y-1.5">
-                        <label className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">One-line Tagline</label>
-                        <input type="text" value={profile.tagline} onChange={e => setProfile({...profile, tagline: e.target.value})} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-indigo-500" placeholder="Catchy phrase..." />
+                    <div className="space-y-3">
+                        <label className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest">Profile tagline</label>
+                        <input type="text" value={profile.tagline} onChange={e => setProfile({...profile, tagline: e.target.value})} className="w-full bg-paper border border-slate-50 rounded-2xl px-5 py-4 text-charcoal focus:outline-none focus:border-calm-200 text-sm font-light italic" />
                     </div>
 
-                    <div className="space-y-1.5">
-                        <label className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">How you will help</label>
-                        <textarea value={profile.approach} onChange={e => setProfile({...profile, approach: e.target.value})} className="w-full h-32 bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-indigo-500 resize-none" />
+                    <div className="space-y-3">
+                        <label className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest">Your approach to resolution</label>
+                        <textarea value={profile.approach} onChange={e => setProfile({...profile, approach: e.target.value})} className="w-full h-40 bg-paper border border-slate-50 rounded-3xl px-6 py-5 text-charcoal focus:outline-none focus:border-calm-200 text-sm font-light resize-none leading-relaxed" />
                     </div>
 
-                    <div className="pt-4 relative">
-                        <button type="submit" disabled={saveStatus === 'saving'} className={`w-full py-4 rounded-2xl font-bold transition-all flex items-center justify-center gap-3 active:scale-[0.98] ${saveStatus === 'saved' ? 'bg-emerald-600 text-white' : 'bg-indigo-600 text-white hover:bg-indigo-500 shadow-xl shadow-indigo-900/20'}`}>
-                          {saveStatus === 'saving' ? <span className="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full" /> : saveStatus === 'saved' ? <><Check size={20} /> Changes Saved!</> : <><Save size={20} /> Save Changes</>}
+                    <div className="pt-6">
+                        <button type="submit" disabled={saveStatus === 'saving'} className={`w-full py-5 rounded-full font-medium transition-all text-sm flex items-center justify-center gap-3 ${saveStatus === 'saved' ? 'bg-sage text-white' : 'bg-calm-500 text-white hover:bg-calm-600 shadow-sm'}`}>
+                          {saveStatus === 'saving' ? 'Updating...' : saveStatus === 'saved' ? <><Check size={18} /> Profile secured</> : 'Update profile'}
                         </button>
                     </div>
                   </form>
@@ -162,24 +154,38 @@ const MentorDashboard: React.FC<Props> = ({ user, allSessions, onUpdateProfile, 
         )}
 
         {activeTab === 'schedule' && (
-          <div className="space-y-6">
-             <div className="bg-slate-900 p-8 rounded-3xl border border-slate-800">
-               <div className="flex items-center gap-3 mb-8"><Calendar className="text-indigo-400" size={24} /><h3 className="text-xl font-bold text-slate-100">Active Schedules</h3></div>
+          <div className="space-y-8">
+             <div className="bg-white p-12 rounded-[40px] border border-slate-50 calm-shadow">
+               <div className="flex items-center gap-3 mb-10 text-calm-400">
+                 <Calendar size={20} />
+                 <h3 className="text-xl font-medium">Secured appointments</h3>
+               </div>
+               
                {mySchedules.length === 0 ? (
-                 <div className="text-center py-20 border-2 border-dashed border-slate-800 rounded-2xl bg-slate-950/50"><div className="p-4 bg-slate-900 rounded-full w-fit mx-auto text-slate-600 mb-4"><Clock size={32} /></div><p className="text-slate-400 font-medium">No sessions booked yet.</p></div>
+                 <div className="text-center py-24 border-2 border-dashed border-slate-50 rounded-[32px] bg-paper/30">
+                   <p className="text-slate-300 font-light italic">No resolution sessions scheduled yet.</p>
+                 </div>
                ) : (
-                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                     {mySchedules.map((session) => (
-                      <div key={session.id} className="p-6 bg-slate-950 rounded-2xl border border-slate-800 hover:border-indigo-500/50 transition-all group">
-                        <div className="flex justify-between items-start mb-6">
-                           <div className="flex items-center gap-3">
-                              <div className="w-10 h-10 bg-slate-800 rounded-xl flex items-center justify-center text-indigo-400"><UserIcon size={20} /></div>
-                              <div><h4 className="font-bold text-slate-200">User-{session.userId?.slice(-4) || '??'}</h4><p className="text-[10px] text-slate-500 uppercase font-bold tracking-widest">{session.label}</p></div>
+                      <div key={session.id} className="p-8 bg-paper rounded-[32px] border border-slate-50 hover:border-calm-100 transition-all group">
+                        <div className="flex justify-between items-start mb-8">
+                           <div className="flex items-center gap-4">
+                              <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-calm-500 calm-shadow border border-slate-50 font-medium">U</div>
+                              <div>
+                                <h4 className="font-medium">User-{session.userId?.slice(-4)}</h4>
+                                <p className="text-[10px] text-slate-400 uppercase font-semibold tracking-widest">{session.label}</p>
+                              </div>
                            </div>
-                           <div className="text-right"><div className="flex items-center gap-1.5 text-emerald-400 text-sm font-bold"><Clock size={14} /> {session.bookedTime?.split(' at ')[1]}</div></div>
                         </div>
-                        <div className="space-y-4 pt-4 border-t border-slate-800/50">
-                           <button onClick={() => setViewingReport(session)} className="w-full flex items-center justify-center gap-2 py-3 bg-slate-800 text-slate-300 rounded-xl text-xs font-bold uppercase tracking-widest hover:bg-indigo-900/30 hover:text-indigo-300 transition-all border border-slate-700"><FileText size={14} /> Quick Report</button>
+                        <div className="flex items-center gap-2 text-calm-600 font-medium text-sm mb-8">
+                           <Clock size={16} />
+                           {session.bookedTime?.split(' at ')[1]}
+                        </div>
+                        <div className="space-y-3 pt-6 border-t border-slate-100">
+                           <button onClick={() => setViewingReport(session)} className="w-full flex items-center justify-center gap-2 py-3 bg-white text-slate-400 rounded-full text-xs font-medium border border-slate-100 hover:text-calm-500 hover:border-calm-100 transition-all">
+                             <FileText size={14} /> Blueprint summary
+                           </button>
                         </div>
                       </div>
                     ))}
@@ -190,67 +196,138 @@ const MentorDashboard: React.FC<Props> = ({ user, allSessions, onUpdateProfile, 
         )}
 
         {activeTab === 'mentees' && (
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-10">
             <div className="lg:col-span-1 space-y-4">
-               <h3 className="text-xs font-bold uppercase tracking-widest text-slate-500 mb-4">Your Mentees</h3>
-               {mentees.length === 0 ? <p className="text-xs text-slate-600 italic">No mentees connected yet.</p> : mentees.map(([uId, data]) => (
-                  <button key={uId} onClick={() => setSelectedMenteeId(uId)} className={`w-full p-4 rounded-2xl border text-left transition-all flex items-center gap-3 ${selectedMenteeId === uId ? 'bg-indigo-600 border-indigo-500 text-white shadow-lg' : 'bg-slate-900 border-slate-800 text-slate-400 hover:border-slate-700'}`}><UserIcon size={18} /><div className="flex-1 min-w-0"><p className="font-bold truncate text-sm">{data.name}</p><p className={`text-[10px] uppercase font-bold ${selectedMenteeId === uId ? 'text-indigo-200' : 'text-slate-600'}`}>{data.sessions.length} Problems</p></div></button>
+               <h3 className="text-[10px] font-semibold uppercase tracking-widest text-slate-400 mb-6">Connected mentees</h3>
+               {mentees.length === 0 ? (
+                 <p className="text-xs text-slate-300 italic px-2">No active connections.</p>
+               ) : mentees.map(([uId, data]) => (
+                  <button key={uId} onClick={() => setSelectedMenteeId(uId)} className={`w-full p-6 rounded-[28px] border text-left transition-all flex items-center gap-4 ${selectedMenteeId === uId ? 'bg-white border-calm-300 calm-shadow text-charcoal' : 'bg-paper/50 border-transparent text-slate-400 hover:bg-white hover:border-slate-100'}`}>
+                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-medium ${selectedMenteeId === uId ? 'bg-calm-50 text-calm-500' : 'bg-white text-slate-200'}`}>U</div>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium truncate text-sm">{data.name}</p>
+                      <p className="text-[9px] uppercase font-semibold tracking-widest mt-0.5">{data.sessions.length} sessions</p>
+                    </div>
+                  </button>
                ))}
             </div>
+            
             <div className="lg:col-span-3">
               {selectedMenteeId ? (
-                <div className="bg-slate-900 p-8 rounded-3xl border border-slate-800 space-y-8 min-h-[500px]">
-                   <div className="flex items-center gap-4 pb-6 border-b border-slate-800"><div className="w-12 h-12 bg-indigo-900 text-indigo-300 rounded-xl flex items-center justify-center font-bold"><UserIcon size={24} /></div><div><h3 className="text-xl font-bold">{mentees.find(([uId]) => uId === selectedMenteeId)?.[1].name}</h3><p className="text-sm text-slate-500">History of problems shared with you.</p></div></div>
-                   <div className="space-y-6">{mentees.find(([uId]) => uId === selectedMenteeId)?.[1].sessions.map(s => (
-                      <div key={s.id} className="p-6 bg-slate-950 rounded-2xl border border-slate-800 hover:border-indigo-500/30 transition-all"><div className="flex justify-between items-start mb-4"><div><h4 className="font-bold text-lg text-slate-200">{s.label}</h4><p className="text-xs text-slate-500 mt-1 italic">"{s.snapshot.primary_theme}"</p></div><button onClick={() => setViewingReport(s)} className="flex items-center gap-2 px-4 py-2 bg-indigo-900/30 text-indigo-400 rounded-xl text-[10px] font-bold uppercase tracking-widest border border-indigo-900/40 hover:bg-indigo-900/50"><Eye size={12} /> View Full Report</button></div></div>
-                   ))}</div>
+                <div className="bg-white p-12 rounded-[40px] border border-slate-50 calm-shadow space-y-10 min-h-[500px]">
+                   <header className="flex items-center gap-6 pb-8 border-b border-slate-50">
+                     <div className="w-14 h-14 bg-calm-50 text-calm-500 rounded-2xl flex items-center justify-center font-medium"><UserIcon size={24} /></div>
+                     <div>
+                       <h3 className="text-2xl font-medium tracking-tight">{mentees.find(([uId]) => uId === selectedMenteeId)?.[1].name}</h3>
+                       <p className="text-sm text-slate-400 font-light">Dialogue history for this mentee.</p>
+                     </div>
+                   </header>
+                   
+                   <div className="space-y-8">
+                     {mentees.find(([uId]) => uId === selectedMenteeId)?.[1].sessions.map(s => (
+                      <div key={s.id} className="p-8 bg-paper/50 rounded-[32px] border border-slate-50 space-y-6">
+                        <div className="flex justify-between items-start">
+                          <div>
+                            <h4 className="font-medium text-xl text-charcoal/90">{s.label}</h4>
+                            <p className="text-sm text-slate-400 mt-1 italic font-light">"{s.snapshot.primary_theme}"</p>
+                          </div>
+                          <button onClick={() => setViewingReport(s)} className="flex items-center gap-2 px-6 py-2 bg-white text-slate-400 rounded-full text-[10px] font-semibold uppercase tracking-widest border border-slate-100 hover:text-calm-500 transition-all">
+                            <Eye size={12} /> View blueprint
+                          </button>
+                        </div>
+
+                        {/* Dialogue History Insight */}
+                        {s.collaborationHistory && s.collaborationHistory.length > 0 && (
+                          <div className="pt-6 border-t border-slate-100 space-y-4">
+                            <div className="flex items-center gap-2 text-calm-300">
+                              <MessageSquare size={14} />
+                              <span className="text-[10px] font-semibold uppercase tracking-widest">Recent dialogue</span>
+                            </div>
+                            <div className="space-y-3">
+                               {s.collaborationHistory.slice(-2).map(msg => (
+                                 <div key={msg.id} className="flex flex-col gap-1">
+                                   <div className="flex justify-between items-center px-1">
+                                      <span className="text-[9px] font-bold text-slate-300 uppercase">{msg.role === 'user' ? 'Mentee' : 'You'}</span>
+                                      <span className="text-[8px] text-slate-200">{new Date(msg.timestamp).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</span>
+                                   </div>
+                                   <div className={`p-4 text-xs font-light leading-relaxed rounded-2xl ${msg.role === 'user' ? 'bg-white border border-slate-50' : 'bg-calm-50 text-calm-700'}`}>
+                                      {msg.content}
+                                   </div>
+                                 </div>
+                               ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                   ))}
+                   </div>
                 </div>
-              ) : <div className="h-full flex flex-col items-center justify-center p-20 text-center border-2 border-dashed border-slate-800 rounded-3xl text-slate-600"><UserIcon size={48} className="mb-4 opacity-20" /><p>Select a mentee to see history.</p></div>}
+              ) : (
+                <div className="h-full flex flex-col items-center justify-center p-24 text-center border-2 border-dashed border-slate-100 rounded-[40px] text-slate-200">
+                  <UserIcon size={48} className="mb-4 opacity-30" />
+                  <p className="font-light italic">Select a mentee to see resolution history.</p>
+                </div>
+              )}
             </div>
           </div>
         )}
       </div>
 
+      {/* Blueprint View Modal */}
       {viewingReport && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center p-6 fade-in">
-           <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-md" onClick={() => setViewingReport(null)} />
-           <div className="relative bg-slate-900 border border-slate-800 w-full max-w-2xl rounded-3xl shadow-2xl flex flex-col max-h-[90vh] overflow-hidden">
-              <div className="p-6 border-b border-slate-800 flex justify-between items-center bg-slate-900/50">
-                 <div className="flex items-center gap-3"><Sparkles className="text-indigo-400" size={20} /><h3 className="font-bold text-slate-100">Mentee Clarity Report</h3></div>
-                 <button onClick={() => setViewingReport(null)} className="p-2 hover:bg-slate-800 rounded-full text-slate-500 transition-colors"><X size={20} /></button>
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-8 page-arrival">
+           <div className="absolute inset-0 bg-paper/95 backdrop-blur-sm" onClick={() => setViewingReport(null)} />
+           <div className="relative bg-white border border-slate-100 w-full max-w-2xl rounded-[40px] calm-shadow flex flex-col max-h-[90vh] overflow-hidden">
+              <div className="p-10 border-b border-slate-50 flex justify-between items-center">
+                 <div className="flex items-center gap-4 text-calm-500">
+                    <FileText size={20} />
+                    <h3 className="text-xl font-medium">Clarity blueprint details</h3>
+                 </div>
+                 <button onClick={() => setViewingReport(null)} className="p-2 text-slate-300 hover:text-charcoal transition-all"><X size={20} /></button>
               </div>
 
-              <div className="p-8 overflow-y-auto space-y-8 no-scrollbar">
-                 <section className="space-y-3">
-                    <h4 className="text-xs font-bold uppercase tracking-widest text-slate-500 flex justify-between">The Problem Core {(viewingReport.hiddenSnapshotFields?.includes('theme')) && <span className="text-rose-400">[Hidden by User]</span>}</h4>
-                    {viewingReport.hiddenSnapshotFields?.includes('theme') ? <div className="p-4 bg-slate-950/50 border border-slate-800 rounded-xl italic text-slate-600 text-sm">Content restricted for privacy.</div> : (
-                      <p className={`text-2xl font-light text-slate-100 leading-tight ${viewingReport.editedFields?.includes('theme') ? 'border-l-2 border-indigo-500 pl-4' : ''}`}>
-                        "{viewingReport.editedSnapshot?.primary_theme || viewingReport.snapshot.primary_theme}"
-                        {viewingReport.editedFields?.includes('theme') && <span className="block text-[10px] font-bold text-indigo-400 mt-1 uppercase">User Edited</span>}
-                      </p>
-                    )}
-                 </section>
-
-                 <section className="space-y-3">
-                    <h4 className="text-xs font-bold uppercase tracking-widest text-slate-500 flex justify-between">The Bottleneck {(viewingReport.hiddenSnapshotFields?.includes('bottleneck')) && <span className="text-rose-400">[Hidden by User]</span>}</h4>
-                    {viewingReport.hiddenSnapshotFields?.includes('bottleneck') ? <div className="p-4 bg-slate-950/50 border border-slate-800 rounded-xl italic text-slate-600 text-sm">Content restricted for privacy.</div> : (
-                      <div className={`p-4 bg-slate-950 rounded-xl border border-slate-800 ${viewingReport.editedFields?.includes('bottleneck') ? 'border-indigo-500/50' : ''}`}>
-                        <p className="text-sm text-slate-300 italic">"The Bottleneck: {viewingReport.editedSnapshot?.the_bottleneck || viewingReport.snapshot.the_bottleneck}"</p>
-                        {viewingReport.editedFields?.includes('bottleneck') && <span className="block text-[10px] font-bold text-indigo-400 mt-2 uppercase">User Edited</span>}
-                      </div>
-                    )}
+              <div className="p-12 overflow-y-auto space-y-12 no-scrollbar">
+                 <section className="space-y-4">
+                    <h4 className="text-[10px] font-semibold uppercase tracking-widest text-slate-400">Mentee situation</h4>
+                    <p className="text-2xl font-light italic leading-relaxed text-charcoal/90">
+                      "{viewingReport.snapshot.primary_theme}"
+                    </p>
                  </section>
 
                  <section className="space-y-4">
-                    <h4 className="text-xs font-bold uppercase tracking-widest text-slate-500">Pattern Matrix</h4>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                       {(viewingReport.editedSnapshot?.pattern_matrix || viewingReport.snapshot.pattern_matrix).map((p, i) => (
-                         <div key={i} className="p-3 bg-slate-950 border border-slate-800 rounded-xl flex justify-between items-center"><span className="text-xs text-slate-300">{p.behavior}</span><span className={`px-2 py-0.5 rounded text-[10px] font-bold ${p.frequency === 'High' ? 'bg-amber-900/40 text-amber-400' : 'bg-slate-800 text-slate-500'}`}>{p.frequency}</span></div>
-                       ))}
+                    <h4 className="text-[10px] font-semibold uppercase tracking-widest text-slate-400">Operational bottleneck</h4>
+                    <div className="p-8 bg-paper rounded-[28px] text-slate-600 font-light leading-relaxed">
+                      {viewingReport.snapshot.the_bottleneck}
                     </div>
                  </section>
+
+                 {/* Full Collaboration History inside Report View */}
+                 {viewingReport.collaborationHistory && viewingReport.collaborationHistory.length > 0 && (
+                   <section className="space-y-6">
+                      <div className="flex items-center gap-3 text-calm-300">
+                        <MessageSquare size={16} />
+                        <h4 className="text-[10px] font-semibold uppercase tracking-widest">Discussion history</h4>
+                      </div>
+                      <div className="space-y-6 bg-paper/30 p-8 rounded-[32px] border border-slate-50">
+                        {viewingReport.collaborationHistory.map(msg => (
+                          <div key={msg.id} className={`flex flex-col gap-2 ${msg.role === 'user' ? 'items-start' : 'items-end'}`}>
+                            <div className="flex gap-2 items-center px-2">
+                               <span className="text-[8px] font-black uppercase text-slate-300">{msg.role === 'user' ? 'Mentee' : 'You'}</span>
+                            </div>
+                            <div className={`p-5 rounded-3xl text-sm font-light leading-relaxed max-w-[90%] ${msg.role === 'user' ? 'bg-white text-charcoal shadow-sm' : 'bg-calm-50 text-calm-800'}`}>
+                               {msg.content}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                   </section>
+                 )}
               </div>
-              <div className="p-6 bg-slate-900/50 border-t border-slate-800"><button onClick={() => setViewingReport(null)} className="w-full py-3 bg-slate-800 text-slate-300 rounded-xl font-bold text-sm hover:bg-slate-700 transition-all">Finish Reviewing</button></div>
+              <div className="p-10 bg-paper/30 border-t border-slate-50">
+                <button onClick={() => setViewingReport(null)} className="w-full py-4 bg-calm-500 text-white rounded-full font-medium transition-all hover:bg-calm-600 text-sm">
+                  Finish review
+                </button>
+              </div>
            </div>
         </div>
       )}

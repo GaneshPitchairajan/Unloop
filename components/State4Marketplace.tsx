@@ -1,7 +1,7 @@
 
 import React, { useState, useMemo } from 'react';
 import { LifeSnapshot, Mentor, MentorCategory } from '../types';
-import { ArrowRight, Star, ArrowLeft, Filter, Sparkles, Heart, Zap, Shield, Briefcase, Activity, GraduationCap, Users, Brain, TrendingUp, Handshake, ChevronDown } from 'lucide-react';
+import { ArrowRight, Star, ArrowLeft, Heart, Zap, Briefcase, Activity, GraduationCap, Users, Brain, TrendingUp, ChevronDown, Command } from 'lucide-react';
 
 interface Props {
   snapshot: LifeSnapshot;
@@ -37,8 +37,7 @@ const State4Marketplace: React.FC<Props> = ({ snapshot, customMentors = [], onSe
     return 'General Listening / Peer Support';
   }, [snapshot]);
 
-  // Priority categories: Matched + a few related
-  const relatedCategories = useMemo(() => {
+  const priorityCategories = useMemo(() => {
     const base = [matchedCategory];
     if (matchedCategory === 'Career Guidance') base.push('Workplace Issues', 'Life Coaching');
     if (matchedCategory === 'Mental Health & Well-Being') base.push('General Listening / Peer Support', 'Life Coaching');
@@ -46,13 +45,8 @@ const State4Marketplace: React.FC<Props> = ({ snapshot, customMentors = [], onSe
     return Array.from(new Set(base));
   }, [matchedCategory]);
 
-  const displayedCategories = showAllCategories ? ALL_CATEGORIES : relatedCategories;
-
-  const allAvailableMentors = useMemo(() => {
-    return customMentors;
-  }, [customMentors]);
-
-  const filteredMentors = allAvailableMentors.filter(m => filter === 'All' || m.category === filter);
+  const displayedCategories = showAllCategories ? ALL_CATEGORIES : priorityCategories;
+  const filteredMentors = customMentors.filter(m => filter === 'All' || m.category === filter);
 
   const getCategoryIcon = (cat: string) => {
     switch(cat) {
@@ -68,122 +62,101 @@ const State4Marketplace: React.FC<Props> = ({ snapshot, customMentors = [], onSe
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 p-6 md:p-12 fade-in text-slate-100">
-      <div className="max-w-6xl mx-auto">
-        <header className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-8">
-          <div className="flex gap-6">
+    <div className="min-h-screen bg-paper p-12 md:p-20 page-arrival text-charcoal overflow-y-auto">
+      <div className="max-w-6xl mx-auto space-y-16">
+        <header className="flex flex-col md:flex-row md:items-end justify-between gap-12">
+          <div className="space-y-6 flex-1">
             <button 
               onClick={onBack}
-              className="mt-1 p-3 bg-slate-900 rounded-full border border-slate-800 text-slate-400 hover:text-slate-100 hover:border-slate-600 transition-all h-fit"
+              className="flex items-center gap-2 text-slate-400 hover:text-calm-500 transition-all text-sm font-medium"
             >
-              <ArrowLeft size={20} />
+              <ArrowLeft size={16} />
+              <span>Back to map</span>
             </button>
-            <div>
-              <h2 className="text-4xl font-semibold tracking-tight">Expertise Pools</h2>
-              <p className="text-slate-400 mt-2 text-lg font-light max-w-xl">
-                We've prioritized guides who specialize in <span className="text-indigo-400 font-bold">"{matchedCategory}"</span> to help with your bottleneck.
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 text-calm-300">
+                <Command size={16} />
+                <span className="text-[10px] font-semibold uppercase tracking-[0.2em]">UnLOOP Resolution Pool</span>
+              </div>
+              <h2 className="text-4xl font-medium tracking-tight">Meet your guides.</h2>
+              <p className="text-slate-500 text-lg font-light leading-relaxed max-w-xl">
+                We have prepared a selection of specialized guides who match your architectural core.
               </p>
             </div>
           </div>
         </header>
 
-        {/* Filter Section */}
-        <div className="mb-10 space-y-4">
-           <div className="flex flex-wrap gap-2">
+        <div className="space-y-8">
+           <div className="flex flex-wrap gap-3">
               <button
                 onClick={() => setFilter('All')}
-                className={`px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all border ${
-                  filter === 'All' ? 'bg-indigo-600 border-indigo-500 text-white shadow-lg' : 'bg-slate-900 border-slate-800 text-slate-500 hover:text-slate-300'
+                className={`px-8 py-3 rounded-full text-xs font-medium transition-all border ${
+                  filter === 'All' ? 'bg-calm-500 border-calm-500 text-white shadow-sm' : 'bg-white border-slate-100 text-slate-400 hover:text-calm-500'
                 }`}
               >
-                All Recommendations
+                Recommended
               </button>
               {displayedCategories.map((cat) => (
                 <button
                   key={cat}
                   onClick={() => setFilter(cat)}
-                  className={`px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all border flex items-center gap-2 ${
-                    filter === cat ? 'bg-indigo-600 border-indigo-500 text-white shadow-lg' : 'bg-slate-900 border-slate-800 text-slate-500 hover:text-slate-300'
-                  } ${cat === matchedCategory ? 'ring-2 ring-indigo-500/50 border-indigo-500' : ''}`}
+                  className={`px-8 py-3 rounded-full text-xs font-medium transition-all border flex items-center gap-3 ${
+                    filter === cat ? 'bg-calm-500 border-calm-500 text-white shadow-sm' : 'bg-white border-slate-100 text-slate-400 hover:text-calm-500'
+                  }`}
                 >
                   {getCategoryIcon(cat)}
                   {cat}
-                  {cat === matchedCategory && <Sparkles size={10} className="text-indigo-400" />}
                 </button>
               ))}
               
               {!showAllCategories && (
                 <button
                   onClick={() => setShowAllCategories(true)}
-                  className="px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider text-slate-600 hover:text-indigo-400 transition-colors flex items-center gap-2"
+                  className="px-8 py-3 rounded-full text-xs font-medium text-slate-300 hover:text-calm-400 transition-all border border-dashed border-slate-100 flex items-center gap-2"
                 >
                   <ChevronDown size={14} />
-                  Explore All Categories
+                  Explore all categories
                 </button>
               )}
            </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 pb-32">
           {filteredMentors.map((mentor) => (
             <div 
               key={mentor.id}
               onClick={() => onSelectMentor(mentor)}
-              className={`group relative p-6 rounded-3xl transition-all duration-300 cursor-pointer border flex flex-col h-full overflow-hidden
-                ${mentor.category === matchedCategory 
-                  ? 'bg-indigo-950/30 border-indigo-500/50 shadow-xl shadow-indigo-900/10' 
-                  : 'bg-slate-900 border-slate-800 hover:border-slate-700 hover:bg-slate-850 shadow-sm'}`}
+              className={`group p-10 rounded-[40px] transition-all duration-500 cursor-pointer border bg-white calm-shadow hover:translate-y-[-4px]
+                ${mentor.category === matchedCategory ? 'border-calm-100' : 'border-slate-50'}`}
             >
-              {mentor.category === matchedCategory && (
-                <div className="absolute top-0 right-0 p-3 bg-indigo-500 rounded-bl-2xl text-white z-10">
-                  <Sparkles size={16} fill="currentColor" />
-                </div>
-              )}
-
-              <div className="flex items-start gap-4 mb-6">
-                <div className={`w-14 h-14 rounded-2xl flex items-center justify-center font-bold text-xl flex-shrink-0
-                  ${mentor.category === matchedCategory ? 'bg-indigo-600 text-white' : 'bg-slate-800 text-slate-400'}`}>
+              <div className="flex items-center gap-6 mb-8">
+                <div className="w-14 h-14 bg-paper border border-slate-50 rounded-2xl flex items-center justify-center font-medium text-xl text-calm-500">
                   {mentor.name.charAt(0)}
                 </div>
-                <div>
-                  <h3 className="font-bold text-lg group-hover:text-indigo-400 transition-colors">{mentor.name}</h3>
-                  <div className="flex items-center gap-1.5 text-indigo-400 text-[10px] font-bold uppercase tracking-widest mt-0.5">
-                    {getCategoryIcon(mentor.category)}
+                <div className="flex-1">
+                  <h3 className="font-medium text-lg group-hover:text-calm-500 transition-colors truncate">{mentor.name}</h3>
+                  <div className="text-calm-300 text-[10px] font-semibold uppercase tracking-widest mt-1">
                     {mentor.category}
                   </div>
                 </div>
               </div>
 
-              <p className="text-slate-300 text-sm leading-relaxed mb-6 flex-grow line-clamp-3">
-                {mentor.tagline}
+              <p className="text-slate-400 text-base leading-relaxed mb-10 font-light italic line-clamp-2">
+                "{mentor.tagline}"
               </p>
 
-              <div className="space-y-4 pt-4 border-t border-slate-800/50 mt-auto">
-                 <div className="flex items-center justify-between text-xs">
-                    <span className="text-slate-500 font-medium">Expertise</span>
-                    <span className="text-slate-300 font-bold truncate ml-2">{mentor.specialty}</span>
+              <div className="flex items-center justify-between pt-6 border-t border-slate-50">
+                 <div className="flex items-center gap-1 text-slate-300">
+                    <Star size={14} fill="currentColor" />
+                    <span className="text-sm font-medium">{mentor.rating}</span>
                  </div>
-                 <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-1 text-yellow-400">
-                       <Star size={12} fill="currentColor" />
-                       <span className="text-xs font-bold">{mentor.rating}</span>
-                    </div>
-                    <button className="text-indigo-400 text-xs font-bold uppercase tracking-widest flex items-center gap-1 group-hover:gap-2 transition-all">
-                      Profile <ArrowRight size={14} />
-                    </button>
-                 </div>
+                 <button className="text-calm-500 text-xs font-semibold uppercase tracking-widest flex items-center gap-2 group-hover:gap-4 transition-all">
+                   View guide <ArrowRight size={16} />
+                 </button>
               </div>
             </div>
           ))}
         </div>
-
-        {filteredMentors.length === 0 && (
-          <div className="text-center py-20 border-2 border-dashed border-slate-800 rounded-3xl bg-slate-900/50">
-             <Filter size={40} className="mx-auto text-slate-700 mb-4" />
-             <p className="text-slate-500 font-medium">No mentors available in this pool yet.</p>
-             <button onClick={() => setFilter('All')} className="mt-4 text-indigo-400 text-sm font-bold underline">Show all available mentors</button>
-          </div>
-        )}
       </div>
     </div>
   );

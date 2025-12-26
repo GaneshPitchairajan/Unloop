@@ -3,7 +3,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { AppState, Message, LifeSnapshot, Mentor, SessionData, User } from './types';
 import { createChatSession, generateLifeSnapshot, runWithRetry } from './services/geminiService';
 import { Chat, GenerateContentResponse } from "@google/genai";
-import { Menu as MenuIcon } from 'lucide-react';
+import { Menu as MenuIcon, Command } from 'lucide-react';
 
 import LoginPage from './components/LoginPage';
 import LandingPage from './components/LandingPage';
@@ -43,6 +43,7 @@ const App: React.FC = () => {
   
   const [isProcessing, setIsProcessing] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isNavigating, setIsNavigating] = useState(false);
   
   const [allUsers, setAllUsers] = useState<User[]>(() => {
     const saved = localStorage.getItem(USERS_KEY);
@@ -59,6 +60,17 @@ const App: React.FC = () => {
   });
 
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
+
+  // Global Page Navigation Wrapper for animation
+  const navigateTo = (newState: AppState) => {
+    setIsNavigating(true);
+    // Calm arrival: small delay for transition
+    setTimeout(() => {
+      setState(newState);
+      setIsNavigating(false);
+      window.scrollTo(0, 0);
+    }, 500);
+  };
 
   useEffect(() => {
     const savedAuth = localStorage.getItem(AUTH_KEY);
@@ -138,12 +150,12 @@ const App: React.FC = () => {
 
   const handleLogin = (user: User) => {
     setCurrentUser(user);
-    setState(AppState.LANDING);
+    navigateTo(AppState.LANDING);
   };
 
   const handleLogout = () => {
     setCurrentUser(null);
-    setState(AppState.LOGIN);
+    navigateTo(AppState.LOGIN);
     setIsMenuOpen(false);
   };
 
@@ -151,7 +163,7 @@ const App: React.FC = () => {
     try {
       if (window.aistudio && typeof window.aistudio.hasSelectedApiKey === 'function') {
         if (!(await window.aistudio.hasSelectedApiKey())) {
-          setState(AppState.API_KEY_SELECTION);
+          navigateTo(AppState.API_KEY_SELECTION);
           return;
         }
       }
@@ -164,7 +176,7 @@ const App: React.FC = () => {
       setUserMood('');
       setUserPriority('');
       setUserNotes('');
-      setState(AppState.DISCOVERY);
+      navigateTo(AppState.DISCOVERY);
       await processMessage(text);
     } catch (err) {
       alert("Something went wrong. Please try again.");
@@ -180,8 +192,8 @@ const App: React.FC = () => {
       const responseText = result.text || "I'm listening.";
       setHistory(prev => [...prev, { id: Date.now().toString(), role: 'model', content: responseText, timestamp: Date.now() }]);
     } catch (error: any) {
-      if (error?.status === 429 && window.aistudio) setState(AppState.API_KEY_SELECTION);
-      else setHistory(prev => [...prev, { id: Date.now().toString(), role: 'model', content: "Hiccup. Say again?", timestamp: Date.now() }]);
+      if (error?.status === 429 && window.aistudio) navigateTo(AppState.API_KEY_SELECTION);
+      else setHistory(prev => [...prev, { id: Date.now().toString(), role: 'model', content: "Something hiccuped. Could you say that again?", timestamp: Date.now() }]);
     } finally { setIsProcessing(false); }
   };
 
@@ -215,9 +227,9 @@ const App: React.FC = () => {
       const data = await generateLifeSnapshot(history.map(m => `${m.role}: ${m.content}`).join('\n'));
       setSnapshot(data);
       setSessionLabel(data.primary_theme);
-      setState(AppState.INSIGHT);
+      navigateTo(AppState.INSIGHT);
     } catch (e: any) {
-      alert("Analysis failed.");
+      alert("Processing failed. Take a breath and try again.");
     } finally { setIsProcessing(false); }
   };
 
@@ -235,7 +247,6 @@ const App: React.FC = () => {
         const editedFields: string[] = [];
         if (edited.primary_theme !== s.snapshot.primary_theme) editedFields.push('theme');
         if (edited.the_bottleneck !== s.snapshot.the_bottleneck) editedFields.push('bottleneck');
-        if (edited.low_effort_action !== s.snapshot.low_effort_action) editedFields.push('action');
         
         return {
           ...s,
@@ -251,34 +262,50 @@ const App: React.FC = () => {
   const currentSession = sessions.find(s => s.id === currentSessionId);
 
   return (
-    <div className="antialiased text-slate-100 bg-slate-950 min-h-screen relative">
+    <div className="antialiased text-charcoal bg-paper min-h-screen relative font-sans">
+      
+      {/* Brand Watermark - Muted and subtle */}
+      {state !== AppState.LOGIN && state !== AppState.LANDING && (
+        <div className="fixed top-8 left-10 z-30 flex items-center gap-2 pointer-events-none opacity-20">
+          <Command size={16} className="text-calm-400" />
+          <span className="text-[10px] font-semibold uppercase tracking-[0.4em]">UnLOOP</span>
+        </div>
+      )}
+
       {state !== AppState.LOGIN && state !== AppState.API_KEY_SELECTION && (
-        <button onClick={() => setIsMenuOpen(true)} className="fixed top-5 right-6 z-30 p-2.5 bg-slate-900/80 backdrop-blur-md rounded-full shadow-lg border border-slate-700 hover:bg-slate-800 transition-all text-slate-300 hover:text-white"><MenuIcon size={24} /></button>
+        <button onClick={() => setIsMenuOpen(true)} className="fixed top-7 right-10 z-30 p-2.5 bg-white rounded-full shadow-sm border border-slate-50 hover:bg-paper transition-all text-slate-300 hover:text-calm-500"><MenuIcon size={20} /></button>
+      )}
+
+      {/* Navigation Arrival Overlay */}
+      {isNavigating && (
+        <div className="fixed inset-0 z-[100] bg-paper/50 backdrop-blur-[2px] flex items-center justify-center animate-fadeIn">
+          <div className="brand-loader"></div>
+        </div>
       )}
 
       {currentUser && (
         <Menu 
           isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)} sessions={sessions.filter(s => s.userId === currentUser.id)} currentUser={currentUser}
-          onLoadSession={(s) => { setCurrentSessionId(s.id); setHistory(s.history); setSnapshot(s.snapshot); setState(s.snapshot ? AppState.INSIGHT : AppState.DISCOVERY); setIsMenuOpen(false); }}
+          onLoadSession={(s) => { setCurrentSessionId(s.id); setHistory(s.history); setSnapshot(s.snapshot); navigateTo(s.snapshot ? AppState.INSIGHT : AppState.DISCOVERY); setIsMenuOpen(false); }}
           onRenameSession={(id, label) => setSessions(prev => prev.map(s => s.id === id ? { ...s, label } : s))}
-          onNewSession={() => { setCurrentSessionId(null); setHistory([]); setSnapshot(null); setState(AppState.ENTRY); setIsMenuOpen(false); }}
-          onViewAppointment={(s) => { setCurrentSessionId(s.id); setHistory(s.history); setSnapshot(s.snapshot); setState(AppState.APPOINTMENT_DETAILS); setIsMenuOpen(false); }}
-          onOpenMentorDashboard={() => { setState(AppState.MENTOR_DASHBOARD); setIsMenuOpen(false); }}
-          onOpenUserDashboard={() => { setState(AppState.USER_DASHBOARD); setIsMenuOpen(false); }}
+          onNewSession={() => { setCurrentSessionId(null); setHistory([]); setSnapshot(null); navigateTo(AppState.ENTRY); setIsMenuOpen(false); }}
+          onViewAppointment={(s) => { setCurrentSessionId(s.id); setHistory(s.history); setSnapshot(s.snapshot); navigateTo(AppState.APPOINTMENT_DETAILS); setIsMenuOpen(false); }}
+          onOpenMentorDashboard={() => { navigateTo(AppState.MENTOR_DASHBOARD); setIsMenuOpen(false); }}
+          onOpenUserDashboard={() => { navigateTo(AppState.USER_DASHBOARD); setIsMenuOpen(false); }}
           onLogout={handleLogout}
         />
       )}
 
       {state === AppState.LOGIN && <LoginPage onLogin={handleLogin} allUsers={allUsers} />}
-      {state === AppState.LANDING && <LandingPage onStart={() => setState(AppState.ENTRY)} />}
+      {state === AppState.LANDING && <LandingPage onStart={() => navigateTo(AppState.ENTRY)} />}
       {state === AppState.ENTRY && <State1Entry onComplete={handleEntryComplete} />}
-      {state === AppState.API_KEY_SELECTION && <StateApiKeySelection onApiKeySelected={() => setState(AppState.ENTRY)} onContinueWithoutPro={() => setState(AppState.ENTRY)} />}
+      {state === AppState.API_KEY_SELECTION && <StateApiKeySelection onApiKeySelected={() => navigateTo(AppState.ENTRY)} onContinueWithoutPro={() => navigateTo(AppState.ENTRY)} />}
       {state === AppState.DISCOVERY && <State2Discovery chatHistory={history} onSendMessage={handleSendMessage} onTransition={transitionToInsight} isProcessing={isProcessing} />}
       
       {state === AppState.INSIGHT && snapshot && (
         <State3Dashboard 
           data={snapshot} currentLabel={sessionLabel} onRename={(l) => setSessionLabel(l)}
-          onNext={() => setState(AppState.MATCHING)} onBack={() => setState(AppState.DISCOVERY)}
+          onNext={() => navigateTo(AppState.MATCHING)} onBack={() => navigateTo(AppState.DISCOVERY)}
           mood={userMood} setMood={setUserMood} priority={userPriority} setPriority={setUserPriority} notes={userNotes} setNotes={setUserNotes}
           onUpdateReport={handleUpdateReport} 
           hiddenFields={currentSession?.hiddenSnapshotFields || []}
@@ -286,14 +313,14 @@ const App: React.FC = () => {
         />
       )}
 
-      {state === AppState.MATCHING && snapshot && <State3_5Matching snapshot={snapshot} onFinish={() => setState(AppState.MARKETPLACE)} />}
+      {state === AppState.MATCHING && snapshot && <State3_5Matching snapshot={snapshot} onFinish={() => navigateTo(AppState.MARKETPLACE)} />}
 
       {state === AppState.MARKETPLACE && snapshot && (
-        <State4Marketplace snapshot={snapshot} customMentors={activeMentors} onSelectMentor={(m) => { setSelectedMentor(m); setState(AppState.MENTOR_PROFILE); }} onBack={() => setState(AppState.INSIGHT)} />
+        <State4Marketplace snapshot={snapshot} customMentors={activeMentors} onSelectMentor={(m) => { setSelectedMentor(m); navigateTo(AppState.MENTOR_PROFILE); }} onBack={() => navigateTo(AppState.INSIGHT)} />
       )}
 
       {state === AppState.MENTOR_PROFILE && selectedMentor && snapshot && (
-        <State4_5MentorProfile mentor={selectedMentor} snapshot={snapshot} onAccept={() => setState(AppState.CONNECTION)} onBack={() => setState(AppState.MARKETPLACE)} />
+        <State4_5MentorProfile mentor={selectedMentor} snapshot={snapshot} onAccept={() => navigateTo(AppState.CONNECTION)} onBack={() => navigateTo(AppState.MARKETPLACE)} />
       )}
 
       {state === AppState.CONNECTION && snapshot && selectedMentor && (
@@ -302,7 +329,7 @@ const App: React.FC = () => {
             snapshot={snapshot} 
             mentor={selectedMentor} 
             onBookSession={() => setShowBooking(true)} 
-            onBack={() => setState(AppState.MENTOR_PROFILE)} 
+            onBack={() => navigateTo(AppState.MENTOR_PROFILE)} 
             sessionData={currentSession}
             onSendMessage={handleSendCollaborationMessage}
           />
@@ -311,19 +338,19 @@ const App: React.FC = () => {
       )}
 
       {state === AppState.APPOINTMENT_DETAILS && currentSessionId && sessions.find(s => s.id === currentSessionId) && (
-        <State7AppointmentDetails session={sessions.find(s => s.id === currentSessionId)!} onBack={() => setState(AppState.USER_DASHBOARD)} onReschedule={(t, c) => setSessions(prev => prev.map(s => s.id === currentSessionId ? { ...s, bookedTime: t, consentGiven: c } : s))} allSessions={sessions} />
+        <State7AppointmentDetails session={sessions.find(s => s.id === currentSessionId)!} onBack={() => navigateTo(AppState.USER_DASHBOARD)} onReschedule={(t, c) => setSessions(prev => prev.map(s => s.id === currentSessionId ? { ...s, bookedTime: t, consentGiven: c } : s))} allSessions={sessions} />
       )}
 
       {state === AppState.MENTOR_DASHBOARD && currentUser && (
-        <MentorDashboard user={currentUser} allSessions={sessions} onUpdateProfile={handleUpdateMentorProfile} onBack={() => setState(AppState.LANDING)} />
+        <MentorDashboard user={currentUser} allSessions={sessions} onUpdateProfile={handleUpdateMentorProfile} onBack={() => navigateTo(AppState.LANDING)} />
       )}
 
       {state === AppState.USER_DASHBOARD && currentUser && (
         <UserDashboard 
           user={currentUser} sessions={sessions.filter(s => s.userId === currentUser.id)} onUpdateUser={handleUpdateUser}
-          onViewSession={(s) => { setCurrentSessionId(s.id); setHistory(s.history); setSnapshot(s.snapshot); setState(AppState.CONNECTION); }}
-          onViewAppointment={(s) => { setCurrentSessionId(s.id); setHistory(s.history); setSnapshot(s.snapshot); setState(AppState.APPOINTMENT_DETAILS); }}
-          onBack={() => setState(AppState.LANDING)} 
+          onViewSession={(s) => { setCurrentSessionId(s.id); setHistory(s.history); setSnapshot(s.snapshot); navigateTo(AppState.CONNECTION); }}
+          onViewAppointment={(s) => { setCurrentSessionId(s.id); setHistory(s.history); setSnapshot(s.snapshot); navigateTo(AppState.APPOINTMENT_DETAILS); }}
+          onBack={() => navigateTo(AppState.LANDING)} 
         />
       )}
     </div>
