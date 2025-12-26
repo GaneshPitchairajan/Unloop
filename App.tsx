@@ -3,7 +3,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { AppState, Message, LifeSnapshot, Mentor, SessionData, User } from './types';
 import { createChatSession, generateLifeSnapshot, runWithRetry } from './services/geminiService';
 import { Chat, GenerateContentResponse } from "@google/genai";
-import { Menu as MenuIcon, Command } from 'lucide-react';
+import { Menu as MenuIcon, Command, Sparkles } from 'lucide-react';
 
 import LoginPage from './components/LoginPage';
 import LandingPage from './components/LandingPage';
@@ -26,8 +26,12 @@ const STORAGE_KEY = 'unloop_sessions_db';
 const USERS_KEY = 'unloop_users_db';
 const AUTH_KEY = 'unloop_auth_user';
 
+enum InternalState {
+  PROCESSING = 99
+}
+
 const App: React.FC = () => {
-  const [state, setState] = useState<AppState>(AppState.LOGIN);
+  const [state, setState] = useState<AppState | InternalState>(AppState.LOGIN);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   
   const [chatSession, setChatSession] = useState<Chat | null>(null);
@@ -61,15 +65,13 @@ const App: React.FC = () => {
 
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
 
-  // Global Page Navigation Wrapper for high-end cinematic transition
-  const navigateTo = (newState: AppState) => {
+  const navigateTo = (newState: AppState | InternalState) => {
     setIsNavigating(true);
-    // Deep Contrast Launch Anticipation: intentional brief delay for page arrival logic
     setTimeout(() => {
       setState(newState);
       setIsNavigating(false);
       window.scrollTo(0, 0);
-    }, 600);
+    }, 400);
   };
 
   useEffect(() => {
@@ -104,7 +106,7 @@ const App: React.FC = () => {
   }, [currentUser]);
 
   useEffect(() => {
-    if (state !== AppState.API_KEY_SELECTION && state !== AppState.LANDING && state !== AppState.LOGIN) {
+    if (state !== AppState.API_KEY_SELECTION && state !== AppState.LANDING && state !== AppState.LOGIN && state !== InternalState.PROCESSING) {
       try {
         setChatSession(createChatSession());
       } catch (e) {
@@ -193,7 +195,7 @@ const App: React.FC = () => {
       setHistory(prev => [...prev, { id: Date.now().toString(), role: 'model', content: responseText, timestamp: Date.now() }]);
     } catch (error: any) {
       if (error?.status === 429 && window.aistudio) navigateTo(AppState.API_KEY_SELECTION);
-      else setHistory(prev => [...prev, { id: Date.now().toString(), role: 'model', content: "Protocol hiccup. Recalibrating... Can you say that again?", timestamp: Date.now() }]);
+      else setHistory(prev => [...prev, { id: Date.now().toString(), role: 'model', content: "Protocol hiccup. Recalibrating...", timestamp: Date.now() }]);
     } finally { setIsProcessing(false); }
   };
 
@@ -222,15 +224,18 @@ const App: React.FC = () => {
   };
 
   const transitionToInsight = async () => {
-    setIsProcessing(true);
+    navigateTo(InternalState.PROCESSING);
     try {
       const data = await generateLifeSnapshot(history.map(m => `${m.role}: ${m.content}`).join('\n'));
       setSnapshot(data);
       setSessionLabel(data.primary_theme);
-      navigateTo(AppState.INSIGHT);
+      setTimeout(() => {
+        navigateTo(AppState.INSIGHT);
+      }, 1200);
     } catch (e: any) {
-      alert("Analytical scan failed. Recalibrate and try again.");
-    } finally { setIsProcessing(false); }
+      alert("Organizing failed. Please check connection.");
+      navigateTo(AppState.DISCOVERY);
+    }
   };
 
   const handleUpdateMentorProfile = (updatedMentor: Mentor | null) => {
@@ -244,15 +249,10 @@ const App: React.FC = () => {
     if (!currentSessionId) return;
     setSessions(prev => prev.map(s => {
       if (s.id === currentSessionId) {
-        const editedFields: string[] = [];
-        if (edited.primary_theme !== s.snapshot.primary_theme) editedFields.push('theme');
-        if (edited.the_bottleneck !== s.snapshot.the_bottleneck) editedFields.push('bottleneck');
-        
         return {
           ...s,
           editedSnapshot: { ...s.snapshot, ...edited },
-          hiddenSnapshotFields: hiddenFields,
-          editedFields
+          hiddenSnapshotFields: hiddenFields
         };
       }
       return s;
@@ -262,27 +262,29 @@ const App: React.FC = () => {
   const currentSession = sessions.find(s => s.id === currentSessionId);
 
   return (
-    <div className="antialiased text-high bg-void min-h-screen relative font-sans">
+    <div className="antialiased text-high bg-void min-h-screen relative font-sans overflow-hidden">
       
-      {/* Brand Watermark - Professional Intensity */}
-      {state !== AppState.LOGIN && state !== AppState.LANDING && (
-        <div className="fixed top-10 left-12 z-30 flex items-center gap-3 pointer-events-none opacity-40 hover:opacity-100 transition-opacity duration-700">
-          <Command size={20} className="text-resolution-indigo" />
-          <span className="text-[11px] font-black uppercase tracking-[0.5em] text-high">UnLOOP</span>
+      {/* Brand Watermark - Centered to prevent overlap with operational buttons */}
+      {state !== AppState.LOGIN && state !== AppState.LANDING && state !== InternalState.PROCESSING && (
+        <div className="fixed top-8 left-1/2 -translate-x-1/2 z-[5] flex items-center gap-2 pointer-events-none opacity-20 transition-opacity duration-700">
+          <Command size={14} className="text-resolution-indigo" />
+          <span className="text-[9px] font-black uppercase tracking-[0.8em] text-high">UnLOOP</span>
         </div>
       )}
 
-      {state !== AppState.LOGIN && state !== AppState.API_KEY_SELECTION && (
-        <button onClick={() => setIsMenuOpen(true)} className="fixed top-10 right-12 z-30 p-3.5 bg-sanctuary border border-slate-800 rounded-2xl shadow-3xl hover:border-resolution-cyan transition-all text-dim hover:text-white">
-          <MenuIcon size={24} />
+      {state !== AppState.LOGIN && state !== AppState.API_KEY_SELECTION && state !== InternalState.PROCESSING && (
+        <button 
+          onClick={() => setIsMenuOpen(true)} 
+          className="fixed top-8 right-10 z-[60] p-3 bg-sanctuary border border-slate-800 rounded-2xl shadow-3xl hover:border-resolution-cyan transition-all text-dim hover:text-white"
+          aria-label="Open Menu"
+        >
+          <MenuIcon size={20} />
         </button>
       )}
 
-      {/* Navigation Arrival Overlay - Launch Anticipation */}
       {isNavigating && (
         <div className="fixed inset-0 z-[100] bg-void/80 backdrop-blur-[10px] flex flex-col items-center justify-center animate-fadeIn">
-          <div className="brand-loader mb-6 !w-16 !h-16"></div>
-          <p className="text-[10px] font-black uppercase tracking-[0.4em] text-resolution-cyan animate-pulse">Initializing Matrix...</p>
+          <div className="brand-loader mb-4 !w-10 !h-10"></div>
         </div>
       )}
 
@@ -305,6 +307,30 @@ const App: React.FC = () => {
       {state === AppState.API_KEY_SELECTION && <StateApiKeySelection onApiKeySelected={() => navigateTo(AppState.ENTRY)} onContinueWithoutPro={() => navigateTo(AppState.ENTRY)} />}
       {state === AppState.DISCOVERY && <State2Discovery chatHistory={history} onSendMessage={handleSendMessage} onTransition={transitionToInsight} isProcessing={isProcessing} />}
       
+      {state === InternalState.PROCESSING && (
+        <div className="h-screen w-full flex flex-col items-center justify-center bg-void text-high page-arrival px-10">
+          <div className="relative mb-12">
+            <div className="w-24 h-24 border-2 border-resolution-indigo/20 rounded-full animate-ping"></div>
+            <div className="absolute inset-0 flex items-center justify-center">
+              <Sparkles className="text-resolution-cyan animate-pulse" size={40} />
+            </div>
+          </div>
+          <div className="text-center space-y-4">
+            <h2 className="text-2xl font-black tracking-tight text-white uppercase tracking-[0.2em]">Organizing your thoughts...</h2>
+            <p className="text-dim text-lg font-light italic opacity-80">Refining structural nodes for your clarity path.</p>
+          </div>
+          <div className="mt-16 w-48 h-1 bg-slate-900 rounded-full overflow-hidden">
+             <div className="h-full bg-resolution-indigo animate-[loading_1.5s_ease-in-out_infinite]"></div>
+          </div>
+          <style>{`
+            @keyframes loading {
+              0% { width: 0%; transform: translateX(-100%); }
+              100% { width: 100%; transform: translateX(100%); }
+            }
+          `}</style>
+        </div>
+      )}
+
       {state === AppState.INSIGHT && snapshot && (
         <State3Dashboard 
           data={snapshot} currentLabel={sessionLabel} onRename={(l) => setSessionLabel(l)}
@@ -327,17 +353,14 @@ const App: React.FC = () => {
       )}
 
       {state === AppState.CONNECTION && snapshot && selectedMentor && (
-        <>
-          <State5Workspace 
-            snapshot={snapshot} 
-            mentor={selectedMentor} 
-            onBookSession={() => setShowBooking(true)} 
-            onBack={() => navigateTo(AppState.MENTOR_PROFILE)} 
-            sessionData={currentSession}
-            onSendMessage={handleSendCollaborationMessage}
-          />
-          {showBooking && <State6Booking mentor={selectedMentor} existingSessions={sessions} onClose={() => setShowBooking(false)} onComplete={(t, c) => { setShowBooking(false); if (currentSessionId) setSessions(prev => prev.map(s => s.id === currentSessionId ? { ...s, bookedTime: t, consentGiven: c } : s)); }} />}
-        </>
+        <State5Workspace 
+          snapshot={snapshot} 
+          mentor={selectedMentor} 
+          onBookSession={() => setShowBooking(true)} 
+          onBack={() => navigateTo(AppState.MENTOR_PROFILE)} 
+          sessionData={currentSession}
+          onSendMessage={handleSendCollaborationMessage}
+        />
       )}
 
       {state === AppState.APPOINTMENT_DETAILS && currentSessionId && sessions.find(s => s.id === currentSessionId) && (
@@ -355,6 +378,10 @@ const App: React.FC = () => {
           onViewAppointment={(s) => { setCurrentSessionId(s.id); setHistory(s.history); setSnapshot(s.snapshot); navigateTo(AppState.APPOINTMENT_DETAILS); }}
           onBack={() => navigateTo(AppState.LANDING)} 
         />
+      )}
+      
+      {showBooking && selectedMentor && (
+        <State6Booking mentor={selectedMentor} existingSessions={sessions} onClose={() => setShowBooking(false)} onComplete={(t, c) => { setShowBooking(false); if (currentSessionId) setSessions(prev => prev.map(s => s.id === currentSessionId ? { ...s, bookedTime: t, consentGiven: c } : s)); }} />
       )}
     </div>
   );

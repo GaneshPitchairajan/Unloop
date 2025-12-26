@@ -29,13 +29,22 @@ const State4Marketplace: React.FC<Props> = ({ snapshot, customMentors = [], onSe
 
   const matchedCategory = useMemo(() => {
     const text = (snapshot.primary_theme + " " + snapshot.the_bottleneck).toLowerCase();
-    if (text.includes("work") || text.includes("career") || text.includes("job")) return 'Career Guidance';
-    if (text.includes("feel") || text.includes("anxious") || text.includes("burnout") || text.includes("mental")) return 'Mental Health & Well-Being';
-    if (text.includes("business") || text.includes("startup") || text.includes("product")) return 'Startup / Entrepreneurship';
-    if (text.includes("relationship") || text.includes("friend") || text.includes("partner")) return 'Relationship Advice';
-    if (text.includes("study") || text.includes("exam") || text.includes("school")) return 'Academic / Exam Stress';
+    if (text.includes("work") || text.includes("career") || text.includes("job") || text.includes("profession")) return 'Career Guidance';
+    if (text.includes("feel") || text.includes("anxious") || text.includes("burnout") || text.includes("mental") || text.includes("stress")) return 'Mental Health & Well-Being';
+    if (text.includes("business") || text.includes("startup") || text.includes("product") || text.includes("funding")) return 'Startup / Entrepreneurship';
+    if (text.includes("relationship") || text.includes("friend") || text.includes("partner") || text.includes("divorce")) return 'Relationship Advice';
+    if (text.includes("study") || text.includes("exam") || text.includes("school") || text.includes("academic")) return 'Academic / Exam Stress';
     return 'General Listening / Peer Support';
   }, [snapshot]);
+
+  // Enhanced sorting logic to prioritize category matches first
+  const sortedMentors = useMemo(() => {
+    return [...customMentors].sort((a, b) => {
+      if (a.category === matchedCategory && b.category !== matchedCategory) return -1;
+      if (b.category === matchedCategory && a.category !== matchedCategory) return 1;
+      return b.rating - a.rating;
+    });
+  }, [customMentors, matchedCategory]);
 
   const priorityCategories = useMemo(() => {
     const base = [matchedCategory];
@@ -46,7 +55,7 @@ const State4Marketplace: React.FC<Props> = ({ snapshot, customMentors = [], onSe
   }, [matchedCategory]);
 
   const displayedCategories = showAllCategories ? ALL_CATEGORIES : priorityCategories;
-  const filteredMentors = customMentors.filter(m => filter === 'All' || m.category === filter);
+  const filteredMentors = sortedMentors.filter(m => filter === 'All' || m.category === filter);
 
   const getCategoryIcon = (cat: string) => {
     switch(cat) {
@@ -62,9 +71,9 @@ const State4Marketplace: React.FC<Props> = ({ snapshot, customMentors = [], onSe
   };
 
   return (
-    <div className="min-h-screen bg-void p-12 md:p-24 page-arrival text-high overflow-y-auto">
+    <div className="min-h-screen bg-void p-12 md:p-24 page-arrival text-high overflow-y-auto no-scrollbar">
       <div className="max-w-7xl mx-auto space-y-20">
-        <header className="flex flex-col md:flex-row md:items-end justify-between gap-16">
+        <header className="flex flex-col md:flex-row md:items-end justify-between gap-16 relative">
           <div className="space-y-8 flex-1">
             <button 
               onClick={onBack}
@@ -78,7 +87,7 @@ const State4Marketplace: React.FC<Props> = ({ snapshot, customMentors = [], onSe
                 <Command size={24} />
                 <span className="text-[12px] font-black uppercase tracking-[0.5em]">Global Guide Matrix</span>
               </div>
-              <h2 className="text-6xl md:text-7xl font-black tracking-tighter text-white">Select Your <span className="text-dim">Consultant.</span></h2>
+              <h2 className="text-5xl md:text-7xl font-black tracking-tighter text-white">Select Your <span className="text-dim">Consultant.</span></h2>
               <p className="text-dim text-2xl font-light leading-relaxed max-w-2xl">
                 The matrix has filtered {customMentors.length} professional guides aligned with your core bottleneck.
               </p>
@@ -95,7 +104,7 @@ const State4Marketplace: React.FC<Props> = ({ snapshot, customMentors = [], onSe
                   filter === 'All' ? 'bg-resolution-indigo border-resolution-indigo text-white shadow-2xl' : 'bg-sanctuary border-slate-800 text-dim hover:border-slate-600'
                 }`}
               >
-                Full Recommended Matrix
+                Full Matrix
               </button>
               {displayedCategories.map((cat) => (
                 <button
@@ -116,52 +125,55 @@ const State4Marketplace: React.FC<Props> = ({ snapshot, customMentors = [], onSe
                   className="px-8 py-4 rounded-full text-xs font-black uppercase tracking-[0.2em] text-slate-700 hover:text-resolution-cyan transition-all border border-dashed border-slate-800 flex items-center gap-3"
                 >
                   <ChevronDown size={18} />
-                  Expand All Sectors
+                  More Sectors
                 </button>
               )}
            </div>
         </div>
 
         {/* Guide Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 pb-48">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 pb-48">
           {filteredMentors.map((mentor) => (
             <div 
               key={mentor.id}
               onClick={() => onSelectMentor(mentor)}
-              className={`group relative p-12 rounded-[60px] transition-all duration-700 cursor-pointer border bg-sanctuary shadow-3xl hover:-translate-y-4 hover:shadow-resolution-indigo/10
-                ${mentor.category === matchedCategory ? 'border-resolution-indigo/40' : 'border-slate-800/40'}`}
+              className={`group relative p-10 rounded-[50px] transition-all duration-700 cursor-pointer border bg-sanctuary shadow-3xl hover:-translate-y-4 hover:shadow-resolution-indigo/10 flex flex-col
+                ${mentor.category === matchedCategory ? 'border-resolution-indigo/40 ring-1 ring-resolution-indigo/20' : 'border-slate-800/40'}`}
             >
-              {/* Match Badge */}
-              {mentor.category === matchedCategory && (
-                <div className="absolute top-10 right-10 flex items-center gap-2 px-4 py-1.5 bg-resolution-cyan/10 border border-resolution-cyan/20 rounded-full text-[10px] font-black text-resolution-cyan uppercase tracking-widest">
-                  <CheckCircle size={12} />
-                  Structural Match
-                </div>
-              )}
-
-              <div className="flex items-center gap-8 mb-12">
-                <div className="w-20 h-20 bg-void border border-slate-800 rounded-[30px] flex items-center justify-center font-black text-3xl text-resolution-indigo shadow-inner group-hover:border-resolution-cyan transition-colors duration-500">
+              {/* Card Header Container to avoid overlap */}
+              <div className="flex justify-between items-start mb-10 w-full overflow-hidden">
+                <div className="w-16 h-16 bg-void border border-slate-800 rounded-[24px] flex items-center justify-center font-black text-2xl text-resolution-indigo shadow-inner group-hover:border-resolution-cyan transition-colors duration-500 shrink-0">
                   {mentor.name.charAt(0)}
                 </div>
-                <div className="flex-1 min-w-0">
-                  <h3 className="font-black text-2xl group-hover:text-resolution-cyan transition-colors truncate text-white">{mentor.name}</h3>
-                  <div className="text-dim text-[10px] font-black uppercase tracking-[0.3em] mt-1">
-                    Sector: {mentor.category}
+                
+                {mentor.category === matchedCategory && (
+                  <div className="flex items-center gap-2 px-3 py-1.5 bg-resolution-cyan/10 border border-resolution-cyan/20 rounded-full text-[9px] font-black text-resolution-cyan uppercase tracking-widest shrink-0">
+                    <CheckCircle size={10} />
+                    Logical Match
                   </div>
-                </div>
+                )}
               </div>
 
-              <p className="text-dim text-lg leading-relaxed mb-12 font-light italic line-clamp-3">
-                "{mentor.tagline}"
-              </p>
+              <div className="flex-1 space-y-4 mb-10">
+                <h3 className="font-black text-2xl group-hover:text-resolution-cyan transition-colors truncate text-white leading-tight pr-2">
+                  {mentor.name}
+                </h3>
+                <div className="text-dim text-[9px] font-black uppercase tracking-[0.3em] flex items-center gap-2">
+                  <Activity size={10} className="text-resolution-indigo" />
+                  {mentor.category}
+                </div>
+                <p className="text-dim text-base leading-relaxed font-light italic line-clamp-3 opacity-80 group-hover:opacity-100 transition-opacity">
+                  "{mentor.tagline}"
+                </p>
+              </div>
 
-              <div className="flex items-center justify-between pt-8 border-t border-slate-800/60">
+              <div className="flex items-center justify-between pt-8 border-t border-slate-800/60 mt-auto">
                  <div className="flex items-center gap-2 text-yellow-500/80">
-                    <Star size={18} fill="currentColor" />
-                    <span className="text-lg font-black">{mentor.rating}</span>
+                    <Star size={16} fill="currentColor" />
+                    <span className="text-base font-black tracking-tight">{mentor.rating}</span>
                  </div>
-                 <button className="text-high text-xs font-black uppercase tracking-[0.3em] flex items-center gap-3 group-hover:gap-6 transition-all group-hover:text-resolution-cyan">
-                   View Profile <ArrowRight size={20} />
+                 <button className="text-high text-[10px] font-black uppercase tracking-[0.2em] flex items-center gap-3 group-hover:gap-5 transition-all group-hover:text-resolution-cyan">
+                   Review Profile <ArrowRight size={18} />
                  </button>
               </div>
             </div>
