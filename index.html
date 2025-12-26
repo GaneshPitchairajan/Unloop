@@ -4,35 +4,27 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>UnLOOP | Calm Ground for Clarity</title>
+    <title>UnLOOP | Professional Resolution Space</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script>
       tailwind.config = {
         theme: {
           extend: {
             colors: {
-              paper: '#FBFBFA', // Soft warm neutral off-white
-              charcoal: '#2D2D2D', // Readable dark text
-              calm: {
-                50: '#F0F4F5',
-                100: '#E1E9EB',
-                200: '#C3D3D7',
-                300: '#A5BDC3',
-                400: '#87A7AF',
-                500: '#69919B', // Muted blue-grey primary
-                600: '#54747C',
-                700: '#3F575D',
-                800: '#2A3A3E',
-                900: '#151D1F',
-              },
-              sage: '#8CA89E', // Alternate muted accent
+              obsidian: '#020617', // Deepest background
+              sanctuary: '#0F172A', // Secondary dark
+              silver: '#F8FAFC', // Crisp light text
+              muted: '#64748B', // Low contrast text
+              unloop: {
+                50: '#EEF2FF',
+                400: '#818CF8',
+                500: '#6366F1', // Primary Brand Indigo
+                600: '#4F46E5',
+              }
             },
             fontFamily: {
               sans: ['"Public Sans"', 'sans-serif'],
-            },
-            lineHeight: {
-              relaxed: '1.7',
             }
           }
         }
@@ -41,41 +33,60 @@
     <style>
       body {
         font-family: 'Public Sans', sans-serif;
-        background-color: #FBFBFA;
-        color: #2D2D2D;
+        background-color: #020617;
+        color: #F8FAFC;
         line-height: 1.7;
         overflow-x: hidden;
       }
       .page-arrival {
-        animation: subtleArrival 1.2s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+        animation: slideUpFade 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
       }
-      @keyframes subtleArrival {
-        from { opacity: 0; transform: translateY(8px); }
-        to { opacity: 1; transform: translateY(0); }
+      @keyframes slideUpFade {
+        from { opacity: 0; transform: translateY(15px); filter: blur(4px); }
+        to { opacity: 1; transform: translateY(0); filter: blur(0); }
       }
-      .slow-fade {
-        animation: fadeIn 2s ease-in-out;
+      .unloop-pulse {
+        animation: pulseBorder 3s infinite;
       }
-      @keyframes fadeIn {
-        from { opacity: 0; }
-        to { opacity: 1; }
+      @keyframes pulseBorder {
+        0% { border-color: rgba(99, 102, 241, 0.2); }
+        50% { border-color: rgba(99, 102, 241, 0.6); }
+        100% { border-color: rgba(99, 102, 241, 0.2); }
       }
-      .calm-shadow {
-        box-shadow: 0 4px 24px -4px rgba(0, 0, 0, 0.04);
+      .stabilizer-path {
+        stroke-dasharray: 500;
+        stroke-dashoffset: 500;
+        animation: stabilize 10s ease-in-out infinite alternate;
       }
-      .unloop-path {
-        stroke-dasharray: 1000;
-        stroke-dashoffset: 1000;
-        animation: drawPath 8s ease-in-out infinite alternate;
+      @keyframes stabilize {
+        0% { stroke-dashoffset: 500; transform: scale(1.1) rotate(5deg); opacity: 0.3; }
+        50% { stroke-dashoffset: 0; transform: scale(1) rotate(0deg); opacity: 1; }
+        100% { stroke-dashoffset: -500; transform: scale(0.95) rotate(-5deg); opacity: 0.5; }
       }
-      @keyframes drawPath {
-        from { stroke-dashoffset: 1000; }
-        to { stroke-dashoffset: 0; }
+      .reveal-btn {
+        animation: revealScale 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
       }
-      ::-webkit-scrollbar { width: 4px; }
-      ::-webkit-scrollbar-track { background: #FBFBFA; }
-      ::-webkit-scrollbar-thumb { background: #E1E9EB; border-radius: 10px; }
-      ::-webkit-scrollbar-thumb:hover { background: #C3D3D7; }
+      @keyframes revealScale {
+        from { opacity: 0; transform: scale(0.9) translateY(10px); }
+        to { opacity: 1; transform: scale(1) translateY(0); }
+      }
+      ::-webkit-scrollbar { width: 5px; }
+      ::-webkit-scrollbar-track { background: #020617; }
+      ::-webkit-scrollbar-thumb { background: #1E293B; border-radius: 10px; }
+      ::-webkit-scrollbar-thumb:hover { background: #334155; }
+
+      .brand-loader {
+        width: 48px;
+        height: 48px;
+        border: 2px solid rgba(99, 102, 241, 0.1);
+        border-top: 2px solid #6366F1;
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+      }
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
     </style>
   <script type="importmap">
 {
