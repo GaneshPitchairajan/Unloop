@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Send, Activity, Mic, ArrowRight, X, Command, Sparkles } from 'lucide-react';
+import { Send, Activity, Mic, ArrowRight, X, Command, Sparkles, BrainCircuit } from 'lucide-react';
 import { Message } from '../types';
 import { extractKeywords } from '../services/geminiService';
 import { GoogleGenAI, LiveServerMessage, Modality } from "@google/genai";
@@ -194,40 +194,54 @@ const State2Discovery: React.FC<Props> = ({ chatHistory, onSendMessage, onTransi
   };
 
   return (
-    <div className="h-screen flex flex-col bg-obsidian page-arrival overflow-hidden text-silver">
-      {/* Header */}
-      <header className="px-10 py-6 bg-sanctuary/80 backdrop-blur-md border-b border-slate-800 flex justify-between items-center z-20">
+    <div className="h-screen flex flex-col bg-void page-arrival overflow-hidden text-high">
+      {/* Header with Glass Effect */}
+      <header className="px-10 py-6 bg-sanctuary/60 backdrop-blur-xl border-b border-slate-800/50 flex justify-between items-center z-20">
         <div className="flex items-center gap-4">
-          <Command size={20} className="text-unloop-400" />
-          <h2 className="text-xl font-bold tracking-tight">Active Resolution Space</h2>
+          <div className="w-10 h-10 bg-resolution-indigo/20 rounded-xl flex items-center justify-center text-resolution-indigo border border-resolution-indigo/30">
+            <Command size={24} />
+          </div>
+          <h2 className="text-xl font-black tracking-tighter uppercase tracking-[0.2em]">Sanctuary Link</h2>
         </div>
         
         <button
           onClick={isLive ? stopLiveSession : startLiveSession}
           disabled={isConnecting}
-          className={`flex items-center gap-3 px-8 py-3 rounded-full text-xs font-bold uppercase tracking-widest transition-all duration-300 border ${
+          className={`flex items-center gap-3 px-10 py-4 rounded-full text-xs font-black uppercase tracking-[0.2em] transition-all duration-500 border ${
             isLive 
-              ? 'bg-red-950 border-red-500 text-red-500 voice-active shadow-lg shadow-red-500/10'
-              : 'bg-obsidian border-slate-700 text-slate-400 hover:border-unloop-500 hover:text-unloop-400'
+              ? 'bg-red-950/40 border-red-500/50 text-red-400 shadow-3xl shadow-red-500/20'
+              : 'bg-sanctuary border-slate-700 text-dim hover:border-resolution-cyan hover:text-resolution-cyan shadow-xl'
           }`}
         >
-          {isConnecting ? "Stabilizing Link..." : isLive ? "Channel Open" : "Map my mental loops via voice"}
+          {isConnecting ? (
+            <div className="brand-loader !w-4 !h-4"></div>
+          ) : isLive ? (
+            <>
+              <Activity size={18} className="animate-pulse" />
+              <span>Voice Channel Open</span>
+            </>
+          ) : (
+            <>
+              <Mic size={18} />
+              <span>Initiate Voice Map</span>
+            </>
+          )}
           {isLive && <X size={14} className="ml-1 opacity-50" />}
         </button>
       </header>
 
-      {/* Chat History */}
-      <div className="flex-1 overflow-y-auto px-8 md:px-24 py-12 space-y-12 scroll-smooth no-scrollbar">
+      {/* Dynamic Chat Flow */}
+      <div className="flex-1 overflow-y-auto px-10 md:px-32 py-16 space-y-16 scroll-smooth no-scrollbar">
         {chatHistory.map((msg) => (
           <div
             key={msg.id}
             className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
           >
             <div
-              className={`max-w-[75%] px-10 py-8 rounded-[40px] transition-all duration-300 shadow-2xl ${
+              className={`max-w-[75%] px-10 py-8 rounded-[45px] transition-all duration-700 shadow-3xl ${
                 msg.role === 'user'
-                  ? 'bg-unloop-600 text-white rounded-br-none'
-                  : 'bg-sanctuary border border-slate-800 text-silver rounded-bl-none'
+                  ? 'bg-gradient-to-br from-resolution-indigo to-resolution-cyan text-void font-bold rounded-br-none scale-entrance'
+                  : 'bg-sanctuary border border-slate-800 text-high rounded-bl-none scale-entrance'
               }`}
             >
               <p className="leading-relaxed whitespace-pre-wrap text-xl font-light">
@@ -237,66 +251,66 @@ const State2Discovery: React.FC<Props> = ({ chatHistory, onSendMessage, onTransi
           </div>
         ))}
         {isProcessing && (
-           <div className="flex justify-start opacity-60">
-             <div className="bg-sanctuary px-8 py-6 rounded-[30px] border border-slate-800 flex items-center gap-4">
+           <div className="flex justify-start opacity-70">
+             <div className="bg-sanctuary/50 px-10 py-7 rounded-[35px] border border-slate-800 flex items-center gap-6">
                <div className="flex gap-2">
-                 <span className="w-2 h-2 bg-unloop-400 rounded-full animate-bounce"></span>
-                 <span className="w-2 h-2 bg-unloop-400 rounded-full animate-bounce delay-100"></span>
-                 <span className="w-2 h-2 bg-unloop-400 rounded-full animate-bounce delay-200"></span>
+                 <span className="w-2.5 h-2.5 bg-resolution-cyan rounded-full animate-bounce"></span>
+                 <span className="w-2.5 h-2.5 bg-resolution-cyan rounded-full animate-bounce delay-100"></span>
+                 <span className="w-2.5 h-2.5 bg-resolution-cyan rounded-full animate-bounce delay-200"></span>
                </div>
-               <span className="text-xs font-black tracking-widest uppercase text-unloop-300">Resolving...</span>
+               <span className="text-xs font-black tracking-[0.3em] uppercase text-resolution-cyan">Architectural Scan...</span>
              </div>
            </div>
         )}
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Footer Area */}
-      <div className="px-12 pb-12 pt-6 bg-obsidian relative z-20">
+      {/* Intelligent Input Zone */}
+      <div className="px-12 pb-14 pt-8 bg-void relative z-20">
         {showOptions ? (
-          <div className="max-w-4xl mx-auto flex flex-col md:flex-row items-center justify-between gap-10 bg-sanctuary p-12 rounded-[50px] border border-slate-800 shadow-3xl animate-arrival">
-            <div className="flex items-center gap-8">
-              <div className="w-20 h-20 bg-unloop-600/10 rounded-[30px] flex items-center justify-center text-unloop-400 shadow-inner">
-                <Sparkles size={36} />
+          <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-12 bg-sanctuary p-14 rounded-[60px] border border-slate-800/60 shadow-3xl animate-arrival">
+            <div className="flex items-center gap-10">
+              <div className="w-24 h-24 bg-resolution-indigo/10 rounded-[40px] flex items-center justify-center text-resolution-cyan border border-resolution-cyan/20 shadow-inner">
+                <BrainCircuit size={48} className="animate-pulse" />
               </div>
               <div>
-                <h4 className="font-bold text-2xl mb-1 text-white">The architecture is clear.</h4>
-                <p className="text-muted font-light text-lg">We have successfully mapped your complexity loops.</p>
+                <h4 className="font-black text-4xl mb-2 text-white tracking-tighter">Structural Integrity 100%.</h4>
+                <p className="text-dim font-light text-xl">The logic knots are successfully identified.</p>
               </div>
             </div>
-            <div className="flex gap-4 w-full md:w-auto">
+            <div className="flex gap-6 w-full md:w-auto">
               <button 
                 onClick={() => setShowOptions(false)}
-                className="flex-1 md:flex-none px-10 py-5 bg-obsidian text-muted font-bold rounded-full hover:text-white transition-all text-sm uppercase tracking-widest"
+                className="flex-1 md:flex-none px-12 py-6 bg-void border border-slate-800 text-dim font-black rounded-full hover:text-white transition-all text-sm uppercase tracking-widest"
               >
-                Refine further
+                Expand Detail
               </button>
               <button 
                 onClick={onTransition}
-                className="flex-1 md:flex-none px-12 py-5 bg-unloop-500 text-white font-black rounded-full hover:bg-unloop-400 transition-all flex items-center justify-center gap-4 text-sm uppercase tracking-widest shadow-xl shadow-unloop-500/20"
+                className="flex-1 md:flex-none px-16 py-6 bg-high text-void font-black rounded-full hover:bg-resolution-cyan transition-all flex items-center justify-center gap-5 text-sm uppercase tracking-[0.2em] shadow-2xl shadow-resolution-cyan/20"
               >
-                Resolve complexity
-                <ArrowRight size={20} />
+                Reveal Clarity
+                <ArrowRight size={24} />
               </button>
             </div>
           </div>
         ) : (
-          <form onSubmit={handleSend} className="relative max-w-5xl mx-auto group">
+          <form onSubmit={handleSend} className="relative max-w-6xl mx-auto group">
             <input
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder="Continue unlooping your thoughts..."
-              className="w-full py-8 px-12 bg-sanctuary border border-slate-800 rounded-full focus:outline-none focus:border-unloop-500 text-silver text-xl placeholder:text-slate-700 transition-all shadow-2xl"
+              placeholder="Inject more structural context..."
+              className="w-full py-10 px-14 bg-sanctuary border border-slate-800 rounded-full focus:outline-none focus:border-resolution-indigo text-high text-2xl placeholder:text-slate-700 transition-all duration-700 shadow-3xl neon-pulse"
               disabled={isProcessing}
             />
-            {input.trim().length > 0 && (
+            {input.trim().length > 3 && (
               <button
                 type="submit"
                 disabled={isProcessing}
-                className="absolute right-4 top-1/2 -translate-y-1/2 p-5 bg-unloop-600 text-white rounded-full hover:bg-unloop-500 transition-all reveal-btn"
+                className="absolute right-5 top-1/2 -translate-y-1/2 p-7 bg-resolution-indigo text-white rounded-full hover:bg-resolution-cyan hover:text-void transition-all button-reveal shadow-2xl"
               >
-                <Send size={24} />
+                <Send size={32} />
               </button>
             )}
           </form>

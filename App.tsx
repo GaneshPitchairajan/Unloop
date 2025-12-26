@@ -61,15 +61,15 @@ const App: React.FC = () => {
 
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
 
-  // Global Page Navigation Wrapper for animation
+  // Global Page Navigation Wrapper for high-end cinematic transition
   const navigateTo = (newState: AppState) => {
     setIsNavigating(true);
-    // Calm arrival: small delay for transition
+    // Deep Contrast Launch Anticipation: intentional brief delay for page arrival logic
     setTimeout(() => {
       setState(newState);
       setIsNavigating(false);
       window.scrollTo(0, 0);
-    }, 500);
+    }, 600);
   };
 
   useEffect(() => {
@@ -193,7 +193,7 @@ const App: React.FC = () => {
       setHistory(prev => [...prev, { id: Date.now().toString(), role: 'model', content: responseText, timestamp: Date.now() }]);
     } catch (error: any) {
       if (error?.status === 429 && window.aistudio) navigateTo(AppState.API_KEY_SELECTION);
-      else setHistory(prev => [...prev, { id: Date.now().toString(), role: 'model', content: "Something hiccuped. Could you say that again?", timestamp: Date.now() }]);
+      else setHistory(prev => [...prev, { id: Date.now().toString(), role: 'model', content: "Protocol hiccup. Recalibrating... Can you say that again?", timestamp: Date.now() }]);
     } finally { setIsProcessing(false); }
   };
 
@@ -229,7 +229,7 @@ const App: React.FC = () => {
       setSessionLabel(data.primary_theme);
       navigateTo(AppState.INSIGHT);
     } catch (e: any) {
-      alert("Processing failed. Take a breath and try again.");
+      alert("Analytical scan failed. Recalibrate and try again.");
     } finally { setIsProcessing(false); }
   };
 
@@ -262,24 +262,27 @@ const App: React.FC = () => {
   const currentSession = sessions.find(s => s.id === currentSessionId);
 
   return (
-    <div className="antialiased text-charcoal bg-paper min-h-screen relative font-sans">
+    <div className="antialiased text-high bg-void min-h-screen relative font-sans">
       
-      {/* Brand Watermark - Muted and subtle */}
+      {/* Brand Watermark - Professional Intensity */}
       {state !== AppState.LOGIN && state !== AppState.LANDING && (
-        <div className="fixed top-8 left-10 z-30 flex items-center gap-2 pointer-events-none opacity-20">
-          <Command size={16} className="text-calm-400" />
-          <span className="text-[10px] font-semibold uppercase tracking-[0.4em]">UnLOOP</span>
+        <div className="fixed top-10 left-12 z-30 flex items-center gap-3 pointer-events-none opacity-40 hover:opacity-100 transition-opacity duration-700">
+          <Command size={20} className="text-resolution-indigo" />
+          <span className="text-[11px] font-black uppercase tracking-[0.5em] text-high">UnLOOP</span>
         </div>
       )}
 
       {state !== AppState.LOGIN && state !== AppState.API_KEY_SELECTION && (
-        <button onClick={() => setIsMenuOpen(true)} className="fixed top-7 right-10 z-30 p-2.5 bg-white rounded-full shadow-sm border border-slate-50 hover:bg-paper transition-all text-slate-300 hover:text-calm-500"><MenuIcon size={20} /></button>
+        <button onClick={() => setIsMenuOpen(true)} className="fixed top-10 right-12 z-30 p-3.5 bg-sanctuary border border-slate-800 rounded-2xl shadow-3xl hover:border-resolution-cyan transition-all text-dim hover:text-white">
+          <MenuIcon size={24} />
+        </button>
       )}
 
-      {/* Navigation Arrival Overlay */}
+      {/* Navigation Arrival Overlay - Launch Anticipation */}
       {isNavigating && (
-        <div className="fixed inset-0 z-[100] bg-paper/50 backdrop-blur-[2px] flex items-center justify-center animate-fadeIn">
-          <div className="brand-loader"></div>
+        <div className="fixed inset-0 z-[100] bg-void/80 backdrop-blur-[10px] flex flex-col items-center justify-center animate-fadeIn">
+          <div className="brand-loader mb-6 !w-16 !h-16"></div>
+          <p className="text-[10px] font-black uppercase tracking-[0.4em] text-resolution-cyan animate-pulse">Initializing Matrix...</p>
         </div>
       )}
 

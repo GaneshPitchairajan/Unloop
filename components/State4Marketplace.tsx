@@ -1,7 +1,7 @@
 
 import React, { useState, useMemo } from 'react';
 import { LifeSnapshot, Mentor, MentorCategory } from '../types';
-import { ArrowRight, Star, ArrowLeft, Heart, Zap, Briefcase, Activity, GraduationCap, Users, Brain, TrendingUp, ChevronDown, Command } from 'lucide-react';
+import { ArrowRight, Star, ArrowLeft, Heart, Zap, Briefcase, Activity, GraduationCap, Users, Brain, TrendingUp, ChevronDown, Command, CheckCircle } from 'lucide-react';
 
 interface Props {
   snapshot: LifeSnapshot;
@@ -50,58 +50,59 @@ const State4Marketplace: React.FC<Props> = ({ snapshot, customMentors = [], onSe
 
   const getCategoryIcon = (cat: string) => {
     switch(cat) {
-      case 'Mental Health & Well-Being': return <Brain size={14} />;
-      case 'Workplace Issues': return <Briefcase size={14} />;
-      case 'Career Guidance': return <TrendingUp size={14} />;
-      case 'Startup / Entrepreneurship': return <Zap size={14} />;
-      case 'Relationship Advice': return <Users size={14} />;
-      case 'Academic / Exam Stress': return <GraduationCap size={14} />;
-      case 'General Listening / Peer Support': return <Heart size={14} />;
-      default: return <Activity size={14} />;
+      case 'Mental Health & Well-Being': return <Brain size={16} />;
+      case 'Workplace Issues': return <Briefcase size={16} />;
+      case 'Career Guidance': return <TrendingUp size={16} />;
+      case 'Startup / Entrepreneurship': return <Zap size={16} />;
+      case 'Relationship Advice': return <Users size={16} />;
+      case 'Academic / Exam Stress': return <GraduationCap size={16} />;
+      case 'General Listening / Peer Support': return <Heart size={16} />;
+      default: return <Activity size={16} />;
     }
   };
 
   return (
-    <div className="min-h-screen bg-paper p-12 md:p-20 page-arrival text-charcoal overflow-y-auto">
-      <div className="max-w-6xl mx-auto space-y-16">
-        <header className="flex flex-col md:flex-row md:items-end justify-between gap-12">
-          <div className="space-y-6 flex-1">
+    <div className="min-h-screen bg-void p-12 md:p-24 page-arrival text-high overflow-y-auto">
+      <div className="max-w-7xl mx-auto space-y-20">
+        <header className="flex flex-col md:flex-row md:items-end justify-between gap-16">
+          <div className="space-y-8 flex-1">
             <button 
               onClick={onBack}
-              className="flex items-center gap-2 text-slate-400 hover:text-calm-500 transition-all text-sm font-medium"
+              className="flex items-center gap-3 text-dim hover:text-resolution-cyan transition-all text-sm font-black uppercase tracking-[0.3em]"
             >
-              <ArrowLeft size={16} />
-              <span>Back to map</span>
+              <ArrowLeft size={20} />
+              <span>Back to Blueprint</span>
             </button>
-            <div className="space-y-2">
-              <div className="flex items-center gap-2 text-calm-300">
-                <Command size={16} />
-                <span className="text-[10px] font-semibold uppercase tracking-[0.2em]">UnLOOP Resolution Pool</span>
+            <div className="space-y-4">
+              <div className="flex items-center gap-3 text-resolution-indigo">
+                <Command size={24} />
+                <span className="text-[12px] font-black uppercase tracking-[0.5em]">Global Guide Matrix</span>
               </div>
-              <h2 className="text-4xl font-medium tracking-tight">Meet your guides.</h2>
-              <p className="text-slate-500 text-lg font-light leading-relaxed max-w-xl">
-                We have prepared a selection of specialized guides who match your architectural core.
+              <h2 className="text-6xl md:text-7xl font-black tracking-tighter text-white">Select Your <span className="text-dim">Consultant.</span></h2>
+              <p className="text-dim text-2xl font-light leading-relaxed max-w-2xl">
+                The matrix has filtered {customMentors.length} professional guides aligned with your core bottleneck.
               </p>
             </div>
           </div>
         </header>
 
-        <div className="space-y-8">
-           <div className="flex flex-wrap gap-3">
+        {/* Matrix Filtering */}
+        <div className="space-y-10">
+           <div className="flex flex-wrap gap-4">
               <button
                 onClick={() => setFilter('All')}
-                className={`px-8 py-3 rounded-full text-xs font-medium transition-all border ${
-                  filter === 'All' ? 'bg-calm-500 border-calm-500 text-white shadow-sm' : 'bg-white border-slate-100 text-slate-400 hover:text-calm-500'
+                className={`px-10 py-4 rounded-full text-xs font-black uppercase tracking-[0.2em] transition-all border ${
+                  filter === 'All' ? 'bg-resolution-indigo border-resolution-indigo text-white shadow-2xl' : 'bg-sanctuary border-slate-800 text-dim hover:border-slate-600'
                 }`}
               >
-                Recommended
+                Full Recommended Matrix
               </button>
               {displayedCategories.map((cat) => (
                 <button
                   key={cat}
                   onClick={() => setFilter(cat)}
-                  className={`px-8 py-3 rounded-full text-xs font-medium transition-all border flex items-center gap-3 ${
-                    filter === cat ? 'bg-calm-500 border-calm-500 text-white shadow-sm' : 'bg-white border-slate-100 text-slate-400 hover:text-calm-500'
+                  className={`px-8 py-4 rounded-full text-xs font-black uppercase tracking-[0.2em] transition-all border flex items-center gap-4 ${
+                    filter === cat ? 'bg-resolution-indigo border-resolution-indigo text-white shadow-2xl' : 'bg-sanctuary border-slate-800 text-dim hover:border-slate-600'
                   }`}
                 >
                   {getCategoryIcon(cat)}
@@ -112,46 +113,55 @@ const State4Marketplace: React.FC<Props> = ({ snapshot, customMentors = [], onSe
               {!showAllCategories && (
                 <button
                   onClick={() => setShowAllCategories(true)}
-                  className="px-8 py-3 rounded-full text-xs font-medium text-slate-300 hover:text-calm-400 transition-all border border-dashed border-slate-100 flex items-center gap-2"
+                  className="px-8 py-4 rounded-full text-xs font-black uppercase tracking-[0.2em] text-slate-700 hover:text-resolution-cyan transition-all border border-dashed border-slate-800 flex items-center gap-3"
                 >
-                  <ChevronDown size={14} />
-                  Explore all categories
+                  <ChevronDown size={18} />
+                  Expand All Sectors
                 </button>
               )}
            </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 pb-32">
+        {/* Guide Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 pb-48">
           {filteredMentors.map((mentor) => (
             <div 
               key={mentor.id}
               onClick={() => onSelectMentor(mentor)}
-              className={`group p-10 rounded-[40px] transition-all duration-500 cursor-pointer border bg-white calm-shadow hover:translate-y-[-4px]
-                ${mentor.category === matchedCategory ? 'border-calm-100' : 'border-slate-50'}`}
+              className={`group relative p-12 rounded-[60px] transition-all duration-700 cursor-pointer border bg-sanctuary shadow-3xl hover:-translate-y-4 hover:shadow-resolution-indigo/10
+                ${mentor.category === matchedCategory ? 'border-resolution-indigo/40' : 'border-slate-800/40'}`}
             >
-              <div className="flex items-center gap-6 mb-8">
-                <div className="w-14 h-14 bg-paper border border-slate-50 rounded-2xl flex items-center justify-center font-medium text-xl text-calm-500">
+              {/* Match Badge */}
+              {mentor.category === matchedCategory && (
+                <div className="absolute top-10 right-10 flex items-center gap-2 px-4 py-1.5 bg-resolution-cyan/10 border border-resolution-cyan/20 rounded-full text-[10px] font-black text-resolution-cyan uppercase tracking-widest">
+                  <CheckCircle size={12} />
+                  Structural Match
+                </div>
+              )}
+
+              <div className="flex items-center gap-8 mb-12">
+                <div className="w-20 h-20 bg-void border border-slate-800 rounded-[30px] flex items-center justify-center font-black text-3xl text-resolution-indigo shadow-inner group-hover:border-resolution-cyan transition-colors duration-500">
                   {mentor.name.charAt(0)}
                 </div>
-                <div className="flex-1">
-                  <h3 className="font-medium text-lg group-hover:text-calm-500 transition-colors truncate">{mentor.name}</h3>
-                  <div className="text-calm-300 text-[10px] font-semibold uppercase tracking-widest mt-1">
-                    {mentor.category}
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-black text-2xl group-hover:text-resolution-cyan transition-colors truncate text-white">{mentor.name}</h3>
+                  <div className="text-dim text-[10px] font-black uppercase tracking-[0.3em] mt-1">
+                    Sector: {mentor.category}
                   </div>
                 </div>
               </div>
 
-              <p className="text-slate-400 text-base leading-relaxed mb-10 font-light italic line-clamp-2">
+              <p className="text-dim text-lg leading-relaxed mb-12 font-light italic line-clamp-3">
                 "{mentor.tagline}"
               </p>
 
-              <div className="flex items-center justify-between pt-6 border-t border-slate-50">
-                 <div className="flex items-center gap-1 text-slate-300">
-                    <Star size={14} fill="currentColor" />
-                    <span className="text-sm font-medium">{mentor.rating}</span>
+              <div className="flex items-center justify-between pt-8 border-t border-slate-800/60">
+                 <div className="flex items-center gap-2 text-yellow-500/80">
+                    <Star size={18} fill="currentColor" />
+                    <span className="text-lg font-black">{mentor.rating}</span>
                  </div>
-                 <button className="text-calm-500 text-xs font-semibold uppercase tracking-widest flex items-center gap-2 group-hover:gap-4 transition-all">
-                   View guide <ArrowRight size={16} />
+                 <button className="text-high text-xs font-black uppercase tracking-[0.3em] flex items-center gap-3 group-hover:gap-6 transition-all group-hover:text-resolution-cyan">
+                   View Profile <ArrowRight size={20} />
                  </button>
               </div>
             </div>

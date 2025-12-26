@@ -1,4 +1,5 @@
 
+import { Type } from "@google/genai";
 import { LifeSnapshot, Mentor } from "./types";
 
 export const SYSTEM_INSTRUCTION = `
@@ -24,34 +25,35 @@ You speak in very simple, plain English.
 - If self-harm is mentioned, output "CRITICAL_SAFETY_PROTOCOL" and direct to emergency services.
 `;
 
+// Updated schema to use Type enum for strict adherence to @google/genai guidelines
 export const SNAPSHOT_SCHEMA = {
   description: "A simple picture of the user's situation.",
-  type: "OBJECT",
+  type: Type.OBJECT,
   properties: {
-    primary_theme: { type: "STRING" },
-    the_bottleneck: { type: "STRING" },
+    primary_theme: { type: Type.STRING },
+    the_bottleneck: { type: Type.STRING },
     pattern_matrix: {
-      type: "ARRAY",
+      type: Type.ARRAY,
       items: {
-        type: "OBJECT",
+        type: Type.OBJECT,
         properties: {
-          behavior: { type: "STRING" },
-          frequency: { type: "STRING", enum: ["High", "Medium", "Low"] }
+          behavior: { type: Type.STRING },
+          frequency: { type: Type.STRING, enum: ["High", "Medium", "Low"] }
         }
       }
     },
     energy_balance: {
-      type: "OBJECT",
+      type: Type.OBJECT,
       properties: {
-        drains: { type: "NUMBER" },
-        gains: { type: "NUMBER" },
-        description: { type: "STRING" }
+        drains: { type: Type.NUMBER },
+        gains: { type: Type.NUMBER },
+        description: { type: Type.STRING }
       }
     },
-    low_effort_action: { type: "STRING" },
+    low_effort_action: { type: Type.STRING },
     suggested_activities: {
-      type: "ARRAY",
-      items: { type: "STRING" },
+      type: Type.ARRAY,
+      items: { type: Type.STRING },
       description: "3 simple activities the user can do on their own to address the problem immediately."
     }
   },

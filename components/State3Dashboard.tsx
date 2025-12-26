@@ -1,8 +1,9 @@
 
 import React, { useState } from 'react';
 import { LifeSnapshot } from '../types';
-import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Cell } from 'recharts';
-import { ArrowRight, Compass, ArrowLeft, Edit2, Check, Activity, Info, FileText, Sparkles, Command, X } from 'lucide-react';
+import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Cell, Tooltip } from 'recharts';
+// Added Zap to the imports from lucide-react to fix the 'Cannot find name Zap' error
+import { ArrowRight, Compass, ArrowLeft, Edit2, Check, Activity, Info, FileText, Sparkles, Command, X, ShieldAlert, Zap } from 'lucide-react';
 
 interface Props {
   data: LifeSnapshot;
@@ -46,178 +47,188 @@ const State3Dashboard: React.FC<Props> = ({
   const PRIORITIES = ['Low', 'Medium', 'High', 'Critical'];
 
   return (
-    <div className="min-h-screen bg-paper p-8 md:p-16 page-arrival overflow-y-auto text-charcoal">
-      <div className="max-w-4xl mx-auto space-y-16 pb-32">
-        <header className="flex flex-col md:flex-row justify-between items-start md:items-end gap-10">
-          <div className="space-y-6 flex-1">
+    <div className="min-h-screen bg-void p-12 md:p-24 page-arrival overflow-y-auto text-high">
+      <div className="max-w-6xl mx-auto space-y-24 pb-48">
+        <header className="flex flex-col md:flex-row justify-between items-start md:items-end gap-12">
+          <div className="space-y-8 flex-1">
             <button 
               onClick={onBack}
-              className="flex items-center gap-2 text-slate-400 hover:text-calm-500 transition-all text-sm font-medium"
+              className="group flex items-center gap-3 text-dim hover:text-resolution-cyan transition-all text-sm font-black uppercase tracking-[0.3em]"
             >
-              <ArrowLeft size={16} />
-              <span>Revisit reflections</span>
+              <ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform" />
+              <span>Back to Reflections</span>
             </button>
-            <div className="space-y-2">
-              <div className="flex items-center gap-2 text-calm-300">
-                <Command size={16} />
-                <span className="text-[10px] font-semibold uppercase tracking-[0.2em]">Clarity Map</span>
+            <div className="space-y-4">
+              <div className="flex items-center gap-3 text-resolution-indigo">
+                <Command size={24} />
+                <span className="text-[14px] font-black uppercase tracking-[0.5em]">Clarity Blueprint v1.0</span>
               </div>
               
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-4">
                 {isEditingName ? (
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-4 w-full max-w-lg">
                     <input 
                       type="text" value={editNameValue} onChange={(e) => setEditNameValue(e.target.value)}
-                      className="bg-white border-b border-calm-500 text-3xl font-medium focus:outline-none"
+                      className="bg-sanctuary border-b-2 border-resolution-cyan text-5xl font-black focus:outline-none w-full"
                       autoFocus
                     />
-                    <button onClick={handleSaveName} className="text-calm-500"><Check size={20} /></button>
+                    <button onClick={handleSaveName} className="p-4 bg-resolution-cyan text-void rounded-2xl"><Check size={28} /></button>
                   </div>
                 ) : (
-                  <div className="flex items-center gap-3 group">
-                    <h2 className="text-4xl font-medium tracking-tight">{currentLabel}</h2>
-                    <button onClick={() => setIsEditingName(true)} className="text-slate-200 group-hover:text-calm-300 transition-all"><Edit2 size={16} /></button>
+                  <div className="flex items-center gap-6 group cursor-pointer" onClick={() => setIsEditingName(true)}>
+                    <h2 className="text-6xl md:text-7xl font-black tracking-tighter text-white leading-none">{currentLabel}</h2>
+                    <Edit2 size={28} className="text-slate-700 group-hover:text-resolution-cyan transition-all" />
                   </div>
                 )}
               </div>
             </div>
           </div>
           
-          <div className="flex gap-4">
+          <div className="flex gap-6">
             <button 
               onClick={() => setShowClarityReport(true)}
-              className="px-8 py-3 bg-white border border-slate-100 calm-shadow text-slate-500 rounded-full font-medium text-sm transition-all"
+              className="px-10 py-5 bg-sanctuary border border-slate-800 text-dim rounded-full font-black text-sm uppercase tracking-widest hover:border-resolution-indigo transition-all shadow-xl"
             >
-              Blueprint detail
+              Technical Detail
             </button>
             <button 
               onClick={onNext} 
-              className="px-10 py-4 bg-calm-500 text-white rounded-full font-medium hover:bg-calm-600 transition-all shadow-md flex items-center gap-3 text-sm"
+              className="px-12 py-5 bg-high text-void rounded-full font-black hover:bg-resolution-indigo hover:text-white transition-all shadow-3xl shadow-resolution-indigo/20 flex items-center gap-5 text-sm uppercase tracking-[0.2em]"
             >
-              Explore guides
-              <ArrowRight size={18} />
+              Consult Experts
+              <ArrowRight size={24} />
             </button>
           </div>
         </header>
 
-        {/* Main Content Sections - One reflection per card */}
-        <div className="space-y-12">
+        {/* Main Insight Modules */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
           
-          {/* Theme Section */}
-          <section className="bg-white p-12 rounded-[40px] border border-slate-50 calm-shadow">
-            <div className="flex items-center gap-3 mb-8 text-calm-400">
-              <Compass size={20} />
-              <h3 className="text-xs font-semibold uppercase tracking-widest">The Core Theme</h3>
-            </div>
-            <p className="text-3xl font-light leading-relaxed italic text-charcoal/90">
-              "{activeSnapshot.primary_theme}"
-            </p>
-          </section>
-
-          {/* Bottleneck Section */}
-          <section className="bg-white p-12 rounded-[40px] border border-slate-50 calm-shadow">
-            <div className="flex items-center gap-3 mb-8 text-calm-400">
-              <Sparkles size={20} />
-              <h3 className="text-xs font-semibold uppercase tracking-widest">The Bottleneck</h3>
-            </div>
-            <p className="text-xl font-light leading-relaxed text-slate-600">
-              {activeSnapshot.the_bottleneck}
-            </p>
-          </section>
-
-          {/* Action Section */}
-          <section className="bg-calm-50 p-12 rounded-[40px] border border-calm-100">
-            <div className="flex items-center gap-3 mb-8 text-calm-600">
-              <Activity size={20} />
-              <h3 className="text-xs font-semibold uppercase tracking-widest">A simple first step</h3>
-            </div>
-            <p className="text-2xl font-medium leading-relaxed italic text-calm-900">
-              "{activeSnapshot.low_effort_action}"
-            </p>
-          </section>
-
-          {/* Energy Section */}
-          <section className="bg-white p-12 rounded-[40px] border border-slate-50 calm-shadow grid grid-cols-1 md:grid-cols-2 gap-12">
-            <div>
-              <div className="flex items-center gap-3 mb-8 text-calm-400">
-                <Info size={20} />
-                <h3 className="text-xs font-semibold uppercase tracking-widest">Energy Balance</h3>
+          {/* Core Theme Module */}
+          <section className="lg:col-span-2 bg-sanctuary p-16 rounded-[60px] border border-slate-800/60 shadow-3xl relative overflow-hidden group">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-resolution-indigo/5 blur-[120px] rounded-full group-hover:bg-resolution-indigo/10 transition-colors"></div>
+            <div className="relative z-10 space-y-12">
+              <div className="flex items-center gap-4 text-resolution-indigo">
+                <Compass size={32} />
+                <h3 className="text-sm font-black uppercase tracking-[0.4em]">Primary Problem Vector</h3>
               </div>
-              <p className="text-sm font-light leading-relaxed text-slate-500 italic">
-                {activeSnapshot.energy_balance.description}
+              <p className="text-4xl md:text-5xl font-light leading-tight italic text-white/90">
+                "{activeSnapshot.primary_theme}"
               </p>
-            </div>
-            <div className="h-32">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={chartData} layout="vertical" barSize={24}>
-                  <XAxis type="number" domain={[0, 10]} hide />
-                  <YAxis dataKey="name" type="category" width={60} tick={{fontSize: 10, fill: '#87A7AF', fontWeight: 600}} axisLine={false} tickLine={false} />
-                  <Bar dataKey="value" radius={[0, 4, 4, 0]}>
-                    {chartData.map((entry, index) => <Cell key={`cell-${index}`} fill={index === 0 ? '#C3D3D7' : '#87A7AF'} />)}
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
+              <div className="pt-12 border-t border-slate-800/50">
+                 <div className="flex items-center gap-4 text-resolution-cyan mb-6">
+                   <ShieldAlert size={20} />
+                   <h4 className="text-[11px] font-black uppercase tracking-[0.4em]">Critical Bottleneck</h4>
+                 </div>
+                 <p className="text-2xl font-light text-dim leading-relaxed">
+                   {activeSnapshot.the_bottleneck}
+                 </p>
+              </div>
             </div>
           </section>
 
-          {/* Input Section */}
-          <section className="bg-white p-12 rounded-[40px] border border-slate-50 calm-shadow space-y-10">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div className="space-y-3">
-                <label className="text-[10px] font-semibold uppercase tracking-widest text-slate-400">Your current mood</label>
-                <select value={mood} onChange={(e) => setMood(e.target.value)} className="w-full bg-paper border-b border-slate-100 py-3 text-sm focus:outline-none focus:border-calm-300 font-light">
-                  <option value="" disabled>Choose...</option>
-                  {MOODS.map(m => <option key={m} value={m}>{m}</option>)}
-                </select>
+          {/* Context Controls Module */}
+          <div className="space-y-12">
+            <section className="bg-sanctuary p-12 rounded-[50px] border border-slate-800/60 shadow-3xl space-y-10">
+              <div className="flex items-center gap-3 text-resolution-indigo">
+                <Activity size={24} />
+                <h3 className="text-[11px] font-black uppercase tracking-[0.4em]">Status Nodes</h3>
               </div>
-              <div className="space-y-3">
-                <label className="text-[10px] font-semibold uppercase tracking-widest text-slate-400">Resolution priority</label>
-                <select value={priority} onChange={(e) => setPriority(e.target.value)} className="w-full bg-paper border-b border-slate-100 py-3 text-sm focus:outline-none focus:border-calm-300 font-light">
-                  <option value="" disabled>Choose...</option>
-                  {PRIORITIES.map(p => <option key={p} value={p}>{p}</option>)}
-                </select>
+              <div className="space-y-8">
+                <div className="space-y-4">
+                  <label className="text-[10px] font-black uppercase tracking-widest text-slate-500">Emotional state</label>
+                  <select value={mood} onChange={(e) => setMood(e.target.value)} className="w-full bg-void border border-slate-800 rounded-2xl p-5 text-high text-sm font-bold focus:border-resolution-cyan outline-none appearance-none cursor-pointer">
+                    <option value="" disabled>Initialize...</option>
+                    {MOODS.map(m => <option key={m} value={m}>{m}</option>)}
+                  </select>
+                </div>
+                <div className="space-y-4">
+                  <label className="text-[10px] font-black uppercase tracking-widest text-slate-500">Resource priority</label>
+                  <select value={priority} onChange={(e) => setPriority(e.target.value)} className="w-full bg-void border border-slate-800 rounded-2xl p-5 text-high text-sm font-bold focus:border-resolution-cyan outline-none appearance-none cursor-pointer">
+                    <option value="" disabled>Assign...</option>
+                    {PRIORITIES.map(p => <option key={p} value={p}>{p}</option>)}
+                  </select>
+                </div>
               </div>
-            </div>
-            <div className="space-y-3">
-              <label className="text-[10px] font-semibold uppercase tracking-widest text-slate-400">Notes for your guide</label>
-              <textarea value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Anything else your guide should know?" className="w-full h-24 bg-paper border border-slate-50 rounded-2xl p-6 text-sm focus:outline-none focus:border-calm-100 resize-none font-light" />
-            </div>
-          </section>
+            </section>
+
+            {/* Energy Analysis Module */}
+            <section className="bg-sanctuary p-12 rounded-[50px] border border-slate-800/60 shadow-3xl">
+              <div className="flex items-center gap-3 mb-8 text-resolution-cyan">
+                <Sparkles size={24} />
+                <h3 className="text-[11px] font-black uppercase tracking-[0.4em]">Balance Matrix</h3>
+              </div>
+              <div className="h-40 mb-6">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={chartData} layout="vertical" barSize={32}>
+                    <XAxis type="number" domain={[0, 10]} hide />
+                    <YAxis dataKey="name" type="category" width={60} tick={{fontSize: 12, fill: '#64748B', fontWeight: 900}} axisLine={false} tickLine={false} />
+                    <Bar dataKey="value" radius={[0, 8, 8, 0]}>
+                      {chartData.map((entry, index) => <Cell key={`cell-${index}`} fill={index === 0 ? '#EF4444' : '#22D3EE'} />)}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+              <p className="text-sm font-light leading-relaxed text-dim italic text-center">
+                "{activeSnapshot.energy_balance.description}"
+              </p>
+            </section>
+          </div>
         </div>
+
+        {/* Tactical Recommendation Module */}
+        <section className="bg-gradient-to-r from-resolution-indigo/20 to-resolution-cyan/10 p-16 rounded-[60px] border border-resolution-indigo/30 shadow-3xl relative group overflow-hidden">
+           <div className="absolute top-0 left-0 w-full h-full bg-void/40 backdrop-blur-sm -z-10"></div>
+           <div className="flex flex-col md:flex-row items-center gap-16">
+              <div className="w-32 h-32 bg-resolution-indigo text-white rounded-[40px] flex items-center justify-center shadow-2xl group-hover:rotate-6 transition-transform duration-500 shrink-0">
+                 {/* Zap is now imported and correctly used */}
+                 <Zap size={64} fill="currentColor" />
+              </div>
+              <div className="space-y-6">
+                 <h3 className="text-[12px] font-black uppercase tracking-[0.5em] text-resolution-cyan">Immediate Resolution Action</h3>
+                 <p className="text-4xl md:text-5xl font-black tracking-tighter text-white leading-tight">
+                   "{activeSnapshot.low_effort_action}"
+                 </p>
+              </div>
+           </div>
+        </section>
       </div>
 
-      {/* Blueprint Detail Modal */}
+      {/* Detail Protocol Overlay */}
       {showClarityReport && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center p-8 page-arrival">
-           <div className="absolute inset-0 bg-paper/95 backdrop-blur-sm" onClick={() => setShowClarityReport(null)} />
-           <div className="relative bg-white border border-slate-100 w-full max-w-2xl rounded-[40px] calm-shadow flex flex-col max-h-[90vh] overflow-hidden">
-              <div className="p-10 flex justify-between items-center border-b border-slate-50">
-                 <h3 className="text-xl font-medium tracking-tight">Blueprint details</h3>
-                 <button onClick={() => setShowClarityReport(null)} className="p-2 text-slate-300 hover:text-charcoal transition-all"><X size={20} /></button>
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-12 animate-arrival">
+           {/* Fixed: Use false instead of null for boolean state setter */}
+           <div className="absolute inset-0 bg-void/95 backdrop-blur-md" onClick={() => setShowClarityReport(false)} />
+           <div className="relative bg-sanctuary border border-slate-800 w-full max-w-4xl rounded-[60px] shadow-3xl flex flex-col max-h-[90vh] overflow-hidden">
+              <div className="p-12 flex justify-between items-center border-b border-slate-800 bg-sanctuary/50">
+                 <h3 className="text-3xl font-black tracking-tighter uppercase tracking-[0.2em]">Technical Blueprint Detail</h3>
+                 {/* Fixed: Use false instead of null for boolean state setter */}
+                 <button onClick={() => setShowClarityReport(false)} className="p-4 bg-void border border-slate-800 text-dim hover:text-white rounded-full transition-all"><X size={28} /></button>
               </div>
 
-              <div className="p-12 overflow-y-auto space-y-10 no-scrollbar">
-                 <div className="space-y-4">
-                    <h4 className="text-[10px] font-semibold uppercase tracking-widest text-calm-400">Architectural Core</h4>
-                    <p className="text-lg font-light leading-relaxed text-slate-600">{activeSnapshot.the_bottleneck}</p>
+              <div className="p-16 overflow-y-auto space-y-16 no-scrollbar">
+                 <div className="space-y-6">
+                    <h4 className="text-[12px] font-black uppercase tracking-[0.4em] text-resolution-cyan">Analytical core</h4>
+                    <p className="text-2xl font-light leading-relaxed text-high bg-void p-10 rounded-[40px] border border-slate-800/60 shadow-inner">{activeSnapshot.the_bottleneck}</p>
                  </div>
                  
-                 <div className="space-y-4">
-                    <h4 className="text-[10px] font-semibold uppercase tracking-widest text-calm-400">Recommended activities</h4>
-                    <div className="space-y-4">
+                 <div className="space-y-8">
+                    <h4 className="text-[12px] font-black uppercase tracking-[0.4em] text-resolution-cyan">Recommended resolution nodes</h4>
+                    <div className="grid grid-cols-1 gap-6">
                       {activeSnapshot.suggested_activities?.map((act, i) => (
-                        <div key={i} className="flex gap-4 p-6 bg-paper rounded-2xl text-sm font-light text-slate-600">
-                          <span className="text-calm-500 font-semibold">{i + 1}.</span>
-                          {act}
+                        <div key={i} className="flex gap-8 p-10 bg-void/50 border border-slate-800/40 rounded-[40px] text-xl font-light text-dim hover:border-resolution-indigo transition-colors group">
+                          <span className="text-resolution-indigo font-black text-3xl opacity-30 group-hover:opacity-100">{i + 1}</span>
+                          <span className="group-hover:text-high transition-colors">{act}</span>
                         </div>
                       ))}
                     </div>
                  </div>
               </div>
 
-              <div className="p-10 border-t border-slate-50">
-                 <button onClick={() => setShowClarityReport(null)} className="w-full py-4 bg-calm-500 text-white rounded-full font-medium transition-all hover:bg-calm-600 text-sm">
-                    Take a moment to reflect
+              <div className="p-12 border-t border-slate-800">
+                 {/* Fixed: Use false instead of null for boolean state setter */}
+                 <button onClick={() => setShowClarityReport(false)} className="w-full py-6 bg-resolution-indigo text-white rounded-full font-black text-lg uppercase tracking-[0.2em] shadow-2xl hover:bg-resolution-cyan hover:text-void transition-all">
+                    Acknowledge Blueprint
                  </button>
               </div>
            </div>

@@ -1,5 +1,6 @@
+
 import React from 'react';
-import { KeyRound, TriangleAlert } from 'lucide-react';
+import { KeyRound, TriangleAlert, Command, ShieldCheck } from 'lucide-react';
 import { AppState } from '../types';
 
 interface Props {
@@ -16,47 +17,61 @@ const StateApiKeySelection: React.FC<Props> = ({ onApiKeySelected, onContinueWit
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-6 bg-slate-950 text-slate-100 fade-in">
-      <div className="max-w-xl w-full bg-slate-900 border border-slate-800 rounded-3xl p-10 shadow-xl shadow-black/20 text-center space-y-8 relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-48 h-48 bg-indigo-900/20 rounded-full blur-3xl -mr-16 -mt-16 animate-pulse"></div>
-        <div className="absolute bottom-0 left-0 w-48 h-48 bg-slate-800/20 rounded-full blur-3xl -ml-16 -mb-16 animate-pulse delay-500"></div>
+    <div className="min-h-screen flex items-center justify-center p-6 bg-void text-high page-arrival">
+      <div className="max-w-xl w-full bg-sanctuary border border-slate-800 rounded-[60px] p-12 shadow-[0_0_100px_rgba(0,0,0,0.8)] text-center space-y-12 relative overflow-hidden">
+        {/* Decorative elements */}
+        <div className="absolute top-[-20%] right-[-20%] w-64 h-64 bg-resolution-indigo/10 rounded-full blur-[100px] animate-pulse"></div>
+        <div className="absolute bottom-[-20%] left-[-20%] w-64 h-64 bg-resolution-cyan/5 rounded-full blur-[100px] animate-pulse delay-700"></div>
 
-        <div className="relative z-10 space-y-6">
-          <div className="inline-flex items-center justify-center p-3 bg-indigo-900 border border-indigo-700 rounded-2xl mb-2 shadow-lg shadow-indigo-900/10">
-            <KeyRound className="text-indigo-400" size={32} />
+        <div className="relative z-10 space-y-8">
+          <div className="inline-flex items-center justify-center p-6 bg-void border border-slate-800 rounded-[40px] mb-2 shadow-inner">
+            <KeyRound className="text-resolution-indigo" size={48} />
           </div>
-          <h1 className="text-4xl font-semibold text-slate-100 tracking-tight">Access Pro Features</h1>
-          <p className="text-slate-400 text-lg font-light leading-relaxed max-w-md mx-auto">
-            To unlock the full potential and powerful AI models, please select an API key associated with a paid Google Cloud project.
-          </p>
+          
+          <div className="space-y-4">
+            <div className="flex items-center justify-center gap-3 text-resolution-cyan mb-2">
+              <ShieldCheck size={16} />
+              <span className="text-[10px] font-black uppercase tracking-[0.4em]">Protocol Authorization</span>
+            </div>
+            <h1 className="text-4xl md:text-5xl font-black text-white tracking-tight">Access <span className="text-dim">Pro</span> Nodes.</h1>
+            <p className="text-dim text-lg font-light leading-relaxed max-w-sm mx-auto">
+              To activate high-precision architectural models, a professional API key linkage is required.
+            </p>
+          </div>
 
-          <div className="space-y-4 pt-4">
+          <div className="space-y-5 pt-6">
             <button
               onClick={handleSelectKey}
-              className="w-full sm:w-auto px-8 py-4 bg-indigo-600 text-white rounded-full font-bold text-lg hover:bg-indigo-500 shadow-lg shadow-indigo-900/40 transition-all hover:scale-105 transform flex items-center justify-center mx-auto gap-2"
+              className="w-full px-10 py-5 bg-resolution-indigo text-white rounded-full font-black text-sm uppercase tracking-[0.2em] hover:bg-resolution-cyan hover:text-void shadow-2xl shadow-resolution-indigo/20 transition-all active:scale-95 flex items-center justify-center gap-4"
             >
               <KeyRound size={20} />
-              <span>Select API Key</span>
+              <span>Initialize Key Link</span>
             </button>
             <button
               onClick={onContinueWithoutPro}
-              className="w-full sm:w-auto px-8 py-3 bg-slate-800 text-slate-300 rounded-full font-medium text-base hover:bg-slate-700 transition-colors mx-auto block"
+              className="w-full px-10 py-4 bg-void border border-slate-800 text-dim rounded-full font-black text-[10px] uppercase tracking-[0.3em] hover:text-white hover:border-slate-600 transition-all"
             >
-              Continue with basic functionality
+              Maintain Basic Resolution
             </button>
           </div>
 
-          <p className="text-xs text-slate-600 mt-6 flex items-center justify-center gap-2">
-            <TriangleAlert size={14} className="text-amber-500" />
-            <a 
-              href="https://ai.google.dev/gemini-api/docs/billing" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="underline hover:text-slate-400"
-            >
-              Learn more about billing
-            </a>
-          </p>
+          <div className="pt-8 flex flex-col items-center gap-3">
+            <div className="flex items-center gap-2 text-slate-700">
+               <TriangleAlert size={14} className="text-amber-500/50" />
+               <a 
+                 href="https://ai.google.dev/gemini-api/docs/billing" 
+                 target="_blank" 
+                 rel="noopener noreferrer"
+                 className="text-[10px] font-black uppercase tracking-widest underline hover:text-slate-400"
+               >
+                 Review Billing Protocol
+               </a>
+            </div>
+            <div className="flex items-center gap-2 opacity-20">
+              <Command size={12} />
+              <span className="text-[9px] font-black tracking-[0.4em] uppercase">UnLOOP Systems</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>

@@ -12,15 +12,14 @@
         theme: {
           extend: {
             colors: {
-              obsidian: '#020617', // Deepest background
-              sanctuary: '#0F172A', // Secondary dark
-              silver: '#F8FAFC', // Crisp light text
-              muted: '#64748B', // Low contrast text
-              unloop: {
-                50: '#EEF2FF',
-                400: '#818CF8',
-                500: '#6366F1', // Primary Brand Indigo
-                600: '#4F46E5',
+              void: '#010409', // Deepest Obsidian
+              sanctuary: '#0D1117', // Secondary dark
+              high: '#F1F5F9', // High-definition text
+              dim: '#94A3B8', // Secondary text
+              resolution: {
+                indigo: '#6366F1',
+                cyan: '#22D3EE',
+                glow: 'rgba(99, 102, 241, 0.4)'
               }
             },
             fontFamily: {
@@ -33,59 +32,47 @@
     <style>
       body {
         font-family: 'Public Sans', sans-serif;
-        background-color: #020617;
-        color: #F8FAFC;
+        background-color: #010409;
+        color: #F1F5F9;
         line-height: 1.7;
         overflow-x: hidden;
       }
       .page-arrival {
-        animation: slideUpFade 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        animation: pageEntrance 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
       }
-      @keyframes slideUpFade {
-        from { opacity: 0; transform: translateY(15px); filter: blur(4px); }
-        to { opacity: 1; transform: translateY(0); filter: blur(0); }
+      @keyframes pageEntrance {
+        0% { opacity: 0; transform: translateY(20px) scale(0.98); filter: blur(10px); }
+        100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
       }
-      .unloop-pulse {
-        animation: pulseBorder 3s infinite;
+      .neon-pulse:focus {
+        animation: neonPulse 2s infinite alternate;
       }
-      @keyframes pulseBorder {
-        0% { border-color: rgba(99, 102, 241, 0.2); }
-        50% { border-color: rgba(99, 102, 241, 0.6); }
-        100% { border-color: rgba(99, 102, 241, 0.2); }
+      @keyframes neonPulse {
+        from { border-color: rgba(99, 102, 241, 0.2); box-shadow: 0 0 10px rgba(99, 102, 241, 0.1); }
+        to { border-color: rgba(34, 211, 238, 0.8); box-shadow: 0 0 20px rgba(34, 211, 238, 0.3); }
       }
-      .stabilizer-path {
-        stroke-dasharray: 500;
-        stroke-dashoffset: 500;
-        animation: stabilize 10s ease-in-out infinite alternate;
+      .button-reveal {
+        animation: buttonReveal 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
       }
-      @keyframes stabilize {
-        0% { stroke-dashoffset: 500; transform: scale(1.1) rotate(5deg); opacity: 0.3; }
-        50% { stroke-dashoffset: 0; transform: scale(1) rotate(0deg); opacity: 1; }
-        100% { stroke-dashoffset: -500; transform: scale(0.95) rotate(-5deg); opacity: 0.5; }
+      @keyframes buttonReveal {
+        0% { opacity: 0; transform: scale(0.5); filter: blur(4px); }
+        100% { opacity: 1; transform: scale(1); filter: blur(0); }
       }
-      .reveal-btn {
-        animation: revealScale 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-      }
-      @keyframes revealScale {
-        from { opacity: 0; transform: scale(0.9) translateY(10px); }
-        to { opacity: 1; transform: scale(1) translateY(0); }
-      }
-      ::-webkit-scrollbar { width: 5px; }
-      ::-webkit-scrollbar-track { background: #020617; }
+      .stagger-1 { animation-delay: 0.1s; }
+      .stagger-2 { animation-delay: 0.2s; }
+      .stagger-3 { animation-delay: 0.3s; }
+      
+      ::-webkit-scrollbar { width: 4px; }
+      ::-webkit-scrollbar-track { background: #010409; }
       ::-webkit-scrollbar-thumb { background: #1E293B; border-radius: 10px; }
       ::-webkit-scrollbar-thumb:hover { background: #334155; }
-
-      .brand-loader {
-        width: 48px;
-        height: 48px;
-        border: 2px solid rgba(99, 102, 241, 0.1);
-        border-top: 2px solid #6366F1;
-        border-radius: 50%;
-        animation: spin 0.8s linear infinite;
+      
+      .stabilizer-ring {
+        animation: spin-slow 15s linear infinite;
       }
-      @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
+      @keyframes spin-slow {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
       }
     </style>
   <script type="importmap">
