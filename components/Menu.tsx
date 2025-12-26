@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { X, User, Clock, FileText, Calendar, ChevronRight, Edit2, Check, Plus, ShieldCheck, LogOut } from 'lucide-react';
+import { X, User, Clock, FileText, Calendar, ChevronRight, Edit2, Check, Plus, ShieldCheck, LogOut, LayoutDashboard, UserCircle } from 'lucide-react';
 import { SessionData, User as UserType } from '../types';
 
 interface Props {
@@ -13,10 +13,14 @@ interface Props {
   onNewSession: () => void;
   onViewAppointment: (session: SessionData) => void;
   onOpenMentorDashboard: () => void;
+  onOpenUserDashboard: () => void;
   onLogout: () => void;
 }
 
-const Menu: React.FC<Props> = ({ isOpen, onClose, sessions, currentUser, onLoadSession, onRenameSession, onNewSession, onViewAppointment, onOpenMentorDashboard, onLogout }) => {
+const Menu: React.FC<Props> = ({ 
+  isOpen, onClose, sessions, currentUser, onLoadSession, onRenameSession, 
+  onNewSession, onViewAppointment, onOpenMentorDashboard, onOpenUserDashboard, onLogout 
+}) => {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editValue, setEditValue] = useState('');
 
@@ -50,21 +54,22 @@ const Menu: React.FC<Props> = ({ isOpen, onClose, sessions, currentUser, onLoadS
             </button>
           </div>
 
-          {/* User Profile Info */}
-          <div className="flex items-center gap-4 mb-8 p-4 bg-slate-950 rounded-2xl border border-slate-800">
-            <div className="w-12 h-12 bg-indigo-900 text-indigo-300 rounded-full flex items-center justify-center font-bold text-lg border border-indigo-500/30">
+          {/* User Profile Info Area */}
+          <button 
+            onClick={onOpenUserDashboard}
+            className="flex items-center gap-4 mb-8 p-4 bg-slate-950 rounded-2xl border border-slate-800 group hover:border-indigo-500/50 transition-all text-left"
+          >
+            <div className="w-12 h-12 bg-indigo-900 text-indigo-300 rounded-full flex items-center justify-center font-bold text-lg border border-indigo-500/30 group-hover:scale-105 transition-transform">
               {currentUser.name.charAt(0)}
             </div>
             <div className="flex-1">
               <p className="font-bold text-slate-100 truncate">{currentUser.name}</p>
-              <p className="text-[10px] text-slate-500 truncate">{currentUser.email}</p>
-            </div>
-            {currentUser.isMentor && (
-              <div className="p-1.5 bg-indigo-500 text-white rounded-lg shadow-lg shadow-indigo-500/20" title="Active Mentor">
-                <ShieldCheck size={14} />
+              <div className="flex items-center gap-1.5 mt-0.5">
+                <LayoutDashboard size={10} className="text-indigo-400" />
+                <span className="text-[10px] text-slate-500 uppercase tracking-widest font-bold">View Profile & Dashboard</span>
               </div>
-            )}
-          </div>
+            </div>
+          </button>
 
           <div className="flex-1 overflow-y-auto space-y-8 no-scrollbar">
             {/* Main Action */}
@@ -76,7 +81,7 @@ const Menu: React.FC<Props> = ({ isOpen, onClose, sessions, currentUser, onLoadS
               <span>New Conversation</span>
             </button>
 
-            {/* Mentor Profile Access */}
+            {/* Mentor Hub Access */}
             <div className="p-1 bg-slate-950 rounded-xl border border-slate-800">
                <button 
                 onClick={onOpenMentorDashboard}
@@ -84,7 +89,7 @@ const Menu: React.FC<Props> = ({ isOpen, onClose, sessions, currentUser, onLoadS
                >
                  <div className="flex items-center gap-3">
                     <ShieldCheck size={16} className={currentUser.isMentor ? "text-indigo-400" : "text-slate-600"} />
-                    <span className="text-sm font-bold text-slate-300">{currentUser.isMentor ? 'Mentor Dashboard' : 'Become a Mentor'}</span>
+                    <span className="text-sm font-bold text-slate-300">{currentUser.isMentor ? 'Mentor Hub' : 'Become a Mentor'}</span>
                  </div>
                  <ChevronRight size={14} className="text-slate-600 group-hover:text-indigo-400" />
                </button>
@@ -93,7 +98,7 @@ const Menu: React.FC<Props> = ({ isOpen, onClose, sessions, currentUser, onLoadS
             {/* Problems List */}
             <div>
               <h3 className="text-xs font-bold uppercase tracking-widest text-slate-500 mb-4 flex items-center gap-2">
-                <FileText size={14} /> Your Problems
+                <FileText size={14} /> Your Untangling History
               </h3>
               <div className="space-y-3">
                 {sessions.length === 0 ? (
@@ -105,22 +110,30 @@ const Menu: React.FC<Props> = ({ isOpen, onClose, sessions, currentUser, onLoadS
                       onClick={() => editingId !== session.id && onLoadSession(session)}
                       className="w-full text-left p-3 rounded-xl bg-slate-950/50 hover:bg-slate-800 border border-slate-800 hover:border-slate-700 transition-all group cursor-pointer relative"
                     >
-                      <div className="flex justify-between items-start">
-                        {editingId === session.id ? (
-                           <div className="flex items-center gap-2 w-full">
-                             <input value={editValue} onChange={(e) => setEditValue(e.target.value)} onClick={(e) => e.stopPropagation()} className="bg-slate-900 border border-indigo-500 rounded px-2 py-1 text-sm w-full focus:outline-none" autoFocus />
-                             <button onClick={(e) => saveEditing(session.id, e)} className="text-indigo-400 hover:text-indigo-300"><Check size={16} /></button>
-                           </div>
-                        ) : (
-                          <>
-                            <span className="font-medium text-slate-300 text-sm line-clamp-2 group-hover:text-indigo-300 pr-6">
-                              {session.label}
-                            </span>
-                            <div className="flex items-center gap-2">
-                              <button onClick={(e) => startEditing(session, e)} className="text-slate-600 hover:text-white opacity-0 group-hover:opacity-100 transition-opacity"><Edit2 size={12} /></button>
-                              <ChevronRight size={14} className="text-slate-600 group-hover:text-indigo-400" />
-                            </div>
-                          </>
+                      <div className="flex flex-col gap-2">
+                        <div className="flex justify-between items-start">
+                          {editingId === session.id ? (
+                             <div className="flex items-center gap-2 w-full">
+                               <input value={editValue} onChange={(e) => setEditValue(e.target.value)} onClick={(e) => e.stopPropagation()} className="bg-slate-900 border border-indigo-500 rounded px-2 py-1 text-sm w-full focus:outline-none" autoFocus />
+                               <button onClick={(e) => saveEditing(session.id, e)} className="text-indigo-400 hover:text-indigo-300"><Check size={16} /></button>
+                             </div>
+                          ) : (
+                            <>
+                              <span className="font-medium text-slate-300 text-sm line-clamp-2 group-hover:text-indigo-300 pr-6">
+                                {session.label}
+                              </span>
+                              <div className="flex items-center gap-2">
+                                <button onClick={(e) => startEditing(session, e)} className="text-slate-600 hover:text-white opacity-0 group-hover:opacity-100 transition-opacity"><Edit2 size={12} /></button>
+                                <ChevronRight size={14} className="text-slate-600 group-hover:text-indigo-400" />
+                              </div>
+                            </>
+                          )}
+                        </div>
+                        {session.snapshot && editingId !== session.id && (
+                          <div className="flex items-center gap-2 text-[10px] font-bold text-indigo-400/60 uppercase tracking-widest mt-1">
+                            <LayoutDashboard size={10} />
+                            <span>Insight Dashboard Ready</span>
+                          </div>
                         )}
                       </div>
                     </div>
@@ -132,7 +145,7 @@ const Menu: React.FC<Props> = ({ isOpen, onClose, sessions, currentUser, onLoadS
             {/* Appointments */}
             <div>
               <h3 className="text-xs font-bold uppercase tracking-widest text-slate-500 mb-4 flex items-center gap-2">
-                <Calendar size={14} /> Appointments
+                <Calendar size={14} /> Upcoming Sessions
               </h3>
               <div className="space-y-3">
                 {sessions.filter(s => s.bookedTime && s.selectedMentor).length === 0 ? (
@@ -140,8 +153,8 @@ const Menu: React.FC<Props> = ({ isOpen, onClose, sessions, currentUser, onLoadS
                 ) : (
                   sessions.filter(s => s.bookedTime && s.selectedMentor).map(session => (
                     <div key={session.id + 'apt'} onClick={() => onViewAppointment(session)} className="p-3 bg-emerald-900/10 rounded-xl border border-emerald-900/30 hover:bg-emerald-900/20 cursor-pointer transition-colors">
-                      <p className="font-bold text-emerald-400 text-sm">{session.selectedMentor?.name}</p>
-                      <div className="flex items-center gap-2 mt-1 text-emerald-600 text-xs">
+                      <p className="font-bold text-emerald-400 text-sm truncate">{session.selectedMentor?.name}</p>
+                      <div className="flex items-center gap-2 mt-1 text-emerald-600 text-[10px] font-bold">
                         <Clock size={12} />
                         <span>{session.bookedTime}</span>
                       </div>

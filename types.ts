@@ -13,7 +13,8 @@ export enum AppState {
   ETHICS = 9,
   API_KEY_SELECTION = 10,
   APPOINTMENT_DETAILS = 11,
-  MENTOR_DASHBOARD = 12
+  MENTOR_DASHBOARD = 12,
+  USER_DASHBOARD = 13
 }
 
 export interface Message {
@@ -38,6 +39,7 @@ export interface LifeSnapshot {
     description: string;
   };
   low_effort_action: string;
+  suggested_activities?: string[]; // Added for self-solve suggestions
 }
 
 export interface Review {
@@ -47,11 +49,28 @@ export interface Review {
   rating: number;
 }
 
+export type MentorCategory = 
+  | 'Career Guidance' 
+  | 'Mental Health & Well-Being' 
+  | 'Relationship Advice' 
+  | 'Academic / Exam Stress' 
+  | 'Workplace Issues' 
+  | 'Life Coaching' 
+  | 'Technical / Skill Mentorship' 
+  | 'Financial Guidance' 
+  | 'Startup / Entrepreneurship' 
+  | 'General Listening / Peer Support'
+  | 'Emotional' 
+  | 'Practical' 
+  | 'Strategic' 
+  | 'Legal/Financial' 
+  | 'Health';
+
 export interface Mentor {
   id: string;
   name: string;
   type: 'Listener' | 'Domain Strategist' | 'Clarity Architect';
-  category: 'Emotional' | 'Practical' | 'Strategic' | 'Legal/Financial' | 'Health';
+  category: MentorCategory;
   tagline: string;
   specialty: string;
   approach: string; 
@@ -67,6 +86,8 @@ export interface User {
   id: string;
   email: string;
   name: string;
+  phone?: string;
+  bio?: string;
   isMentor: boolean;
   mentorProfile?: Mentor;
 }
@@ -74,6 +95,8 @@ export interface User {
 export interface AnalysisResult {
   keywords: string[];
 }
+
+export type SessionStatus = 'open' | 'resolved' | 'archived';
 
 export interface SessionData {
   id: string;
@@ -87,4 +110,6 @@ export interface SessionData {
   userPriority?: string;
   userNotes?: string;
   consentGiven?: boolean;
+  status?: SessionStatus;
+  userId?: string; // Track who created the session
 }
