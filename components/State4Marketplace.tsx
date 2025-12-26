@@ -1,17 +1,22 @@
 
 import React, { useState, useMemo } from 'react';
 import { LifeSnapshot, Mentor } from '../types';
-import { MOCK_MENTORS } from '../constants';
 import { ArrowRight, Star, ArrowLeft, Filter, Sparkles, Heart, Zap, Shield, Briefcase, Activity } from 'lucide-react';
 
 interface Props {
   snapshot: LifeSnapshot;
+  customMentors?: Mentor[];
   onSelectMentor: (mentor: Mentor) => void;
   onBack: () => void;
 }
 
-const State4Marketplace: React.FC<Props> = ({ snapshot, onSelectMentor, onBack }) => {
+const State4Marketplace: React.FC<Props> = ({ snapshot, customMentors = [], onSelectMentor, onBack }) => {
   const [filter, setFilter] = useState<'All' | 'Emotional' | 'Practical' | 'Strategic'>('All');
+
+  // Merged mentors list (Mock + Real user mentors)
+  const allAvailableMentors = useMemo(() => {
+    return customMentors;
+  }, [customMentors]);
 
   // Intelligent Recommendation logic
   const recommendedId = useMemo(() => {
@@ -22,7 +27,7 @@ const State4Marketplace: React.FC<Props> = ({ snapshot, onSelectMentor, onBack }
     return null;
   }, [snapshot]);
 
-  const filteredMentors = MOCK_MENTORS.filter(m => filter === 'All' || m.category === filter);
+  const filteredMentors = allAvailableMentors.filter(m => filter === 'All' || m.category === filter);
 
   const getCategoryIcon = (cat: string) => {
     switch(cat) {
@@ -97,14 +102,14 @@ const State4Marketplace: React.FC<Props> = ({ snapshot, onSelectMentor, onBack }
                 </div>
               </div>
 
-              <p className="text-slate-300 text-sm leading-relaxed mb-6 flex-grow">
+              <p className="text-slate-300 text-sm leading-relaxed mb-6 flex-grow line-clamp-3">
                 {mentor.tagline}
               </p>
 
               <div className="space-y-4 pt-4 border-t border-slate-800/50 mt-auto">
                  <div className="flex items-center justify-between text-xs">
                     <span className="text-slate-500 font-medium">Expertise</span>
-                    <span className="text-slate-300 font-bold">{mentor.specialty}</span>
+                    <span className="text-slate-300 font-bold truncate ml-2">{mentor.specialty}</span>
                  </div>
                  <div className="flex items-center justify-between text-xs">
                     <span className="text-slate-500 font-medium">Availability</span>

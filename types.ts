@@ -1,17 +1,19 @@
 
 export enum AppState {
+  LOGIN = -1,
   LANDING = 0,
   ENTRY = 1,
   DISCOVERY = 2,
   INSIGHT = 3,
-  MATCHING = 4,   // New: Analysis/Searching state
+  MATCHING = 4,
   MARKETPLACE = 5,
-  MENTOR_PROFILE = 6, // New: Detailed mentor deep-dive
+  MENTOR_PROFILE = 6,
   CONNECTION = 7,
   BOOKING = 8,
   ETHICS = 9,
   API_KEY_SELECTION = 10,
-  APPOINTMENT_DETAILS = 11
+  APPOINTMENT_DETAILS = 11,
+  MENTOR_DASHBOARD = 12
 }
 
 export interface Message {
@@ -52,13 +54,21 @@ export interface Mentor {
   category: 'Emotional' | 'Practical' | 'Strategic' | 'Legal/Financial' | 'Health';
   tagline: string;
   specialty: string;
-  approach: string; // How they help
+  approach: string; 
   matchReason: string;
   rating: number;
   sessionsCount: number;
   similarCases: string[];
   reviews: Review[];
   availability: string;
+}
+
+export interface User {
+  id: string;
+  email: string;
+  name: string;
+  isMentor: boolean;
+  mentorProfile?: Mentor;
 }
 
 export interface AnalysisResult {
