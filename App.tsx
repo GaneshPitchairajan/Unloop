@@ -30,7 +30,6 @@ const App: React.FC = () => {
   const [state, setState] = useState<AppState>(AppState.LOGIN);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   
-  // AI Session state
   const [chatSession, setChatSession] = useState<Chat | null>(null);
   const [history, setHistory] = useState<Message[]>([]);
   const [snapshot, setSnapshot] = useState<LifeSnapshot | null>(null);
@@ -38,7 +37,6 @@ const App: React.FC = () => {
   const [showBooking, setShowBooking] = useState(false);
   const [sessionLabel, setSessionLabel] = useState<string>('');
   
-  // User Inputs
   const [userMood, setUserMood] = useState<string>('');
   const [userPriority, setUserPriority] = useState<string>('');
   const [userNotes, setUserNotes] = useState<string>('');
@@ -46,7 +44,6 @@ const App: React.FC = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   
-  // Persistence states
   const [allUsers, setAllUsers] = useState<User[]>(() => {
     const saved = localStorage.getItem(USERS_KEY);
     return saved ? JSON.parse(saved) : [];
@@ -63,7 +60,6 @@ const App: React.FC = () => {
 
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
 
-  // Auth initialization
   useEffect(() => {
     const savedAuth = localStorage.getItem(AUTH_KEY);
     if (savedAuth) {
@@ -77,19 +73,12 @@ const App: React.FC = () => {
     }
   }, []);
 
-  // Save changes to DBs
-  useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(sessions));
-  }, [sessions]);
-
-  useEffect(() => {
-    localStorage.setItem(USERS_KEY, JSON.stringify(allUsers));
-  }, [allUsers]);
+  useEffect(() => { localStorage.setItem(STORAGE_KEY, JSON.stringify(sessions)); }, [sessions]);
+  useEffect(() => { localStorage.setItem(USERS_KEY, JSON.stringify(allUsers)); }, [allUsers]);
 
   useEffect(() => {
     if (currentUser) {
       localStorage.setItem(AUTH_KEY, JSON.stringify(currentUser));
-      // Sync currentUser back into allUsers list
       setAllUsers(prev => {
         const index = prev.findIndex(u => u.id === currentUser.id);
         if (index === -1) return [...prev, currentUser];
@@ -115,34 +104,34 @@ const App: React.FC = () => {
   useEffect(() => {
     if (snapshot && history.length > 0 && currentSessionId) {
       const label = sessionLabel || snapshot.primary_theme;
-      const sessionData: SessionData = {
-        id: currentSessionId,
-        timestamp: Date.now(),
-        label: label,
-        history,
-        snapshot,
-        selectedMentor: selectedMentor || undefined,
-        userMood,
-        userPriority,
-        userNotes,
-        userId: currentUser?.id,
-        status: 'open'
-      };
       setSessions(prev => {
-        const exists = prev.find(s => s.id === currentSessionId);
-        if (exists) return prev.map(s => s.id === currentSessionId ? { ...s, ...sessionData } : s);
+        const existing = prev.find(s => s.id === currentSessionId);
+        const sessionData: SessionData = {
+          id: currentSessionId,
+          timestamp: Date.now(),
+          label: label,
+          history,
+          collaborationHistory: existing?.collaborationHistory || [],
+          snapshot,
+          editedSnapshot: existing?.editedSnapshot || undefined,
+          hiddenSnapshotFields: existing?.hiddenSnapshotFields || [],
+          editedFields: existing?.editedFields || [],
+          selectedMentor: selectedMentor || undefined,
+          userMood,
+          userPriority,
+          userNotes,
+          userId: currentUser?.id,
+          status: 'open'
+        };
+        if (existing) return prev.map(s => s.id === currentSessionId ? { ...s, ...sessionData } : s);
         return [sessionData, ...prev];
       });
       if (!sessionLabel) setSessionLabel(snapshot.primary_theme);
     }
   }, [snapshot, selectedMentor, history, sessionLabel, userMood, userPriority, userNotes, currentSessionId, currentUser]); 
 
-  // Derived mentor list
   const activeMentors = useMemo(() => {
-    const userMentors = allUsers
-      .filter(u => u.isMentor && u.mentorProfile)
-      .map(u => u.mentorProfile!);
-    // Merge with mock mentors but filter out if the current user is a mentor (so they don't see themselves)
+    const userMentors = allUsers.filter(u => u.isMentor && u.mentorProfile).map(u => u.mentorProfile!);
     const combined = [...userMentors, ...MOCK_MENTORS];
     return combined.filter(m => m.id !== currentUser?.id);
   }, [allUsers, currentUser]);
@@ -201,6 +190,25 @@ const App: React.FC = () => {
     await processMessage(text);
   };
 
+  const handleSendCollaborationMessage = (text: string) => {
+    if (!currentSessionId) return;
+    const newMessage: Message = {
+      id: Date.now().toString(),
+      role: 'user',
+      content: text,
+      timestamp: Date.now()
+    };
+    setSessions(prev => prev.map(s => {
+      if (s.id === currentSessionId) {
+        return {
+          ...s,
+          collaborationHistory: [...(s.collaborationHistory || []), newMessage]
+        };
+      }
+      return s;
+    }));
+  };
+
   const transitionToInsight = async () => {
     setIsProcessing(true);
     try {
@@ -209,40 +217,48 @@ const App: React.FC = () => {
       setSessionLabel(data.primary_theme);
       setState(AppState.INSIGHT);
     } catch (e: any) {
-      alert("Analysis failed. Let's keep talking.");
+      alert("Analysis failed.");
     } finally { setIsProcessing(false); }
   };
 
   const handleUpdateMentorProfile = (updatedMentor: Mentor | null) => {
     if (!currentUser) return;
-    setCurrentUser({
-      ...currentUser,
-      isMentor: !!updatedMentor,
-      mentorProfile: updatedMentor || undefined
-    });
+    setCurrentUser({ ...currentUser, isMentor: !!updatedMentor, mentorProfile: updatedMentor || undefined });
   };
 
-  const handleUpdateUser = (updatedUser: User) => {
-    setCurrentUser(updatedUser);
+  const handleUpdateUser = (updatedUser: User) => { setCurrentUser(updatedUser); };
+
+  const handleUpdateReport = (edited: Partial<LifeSnapshot>, hiddenFields: string[]) => {
+    if (!currentSessionId) return;
+    setSessions(prev => prev.map(s => {
+      if (s.id === currentSessionId) {
+        const editedFields: string[] = [];
+        if (edited.primary_theme !== s.snapshot.primary_theme) editedFields.push('theme');
+        if (edited.the_bottleneck !== s.snapshot.the_bottleneck) editedFields.push('bottleneck');
+        if (edited.low_effort_action !== s.snapshot.low_effort_action) editedFields.push('action');
+        
+        return {
+          ...s,
+          editedSnapshot: { ...s.snapshot, ...edited },
+          hiddenSnapshotFields: hiddenFields,
+          editedFields
+        };
+      }
+      return s;
+    }));
   };
+
+  const currentSession = sessions.find(s => s.id === currentSessionId);
 
   return (
     <div className="antialiased text-slate-100 bg-slate-950 min-h-screen relative">
       {state !== AppState.LOGIN && state !== AppState.API_KEY_SELECTION && (
-        <button 
-          onClick={() => setIsMenuOpen(true)}
-          className="fixed top-5 right-6 z-30 p-2.5 bg-slate-900/80 backdrop-blur-md rounded-full shadow-lg border border-slate-700 hover:bg-slate-800 transition-all text-slate-300 hover:text-white"
-        >
-          <MenuIcon size={24} />
-        </button>
+        <button onClick={() => setIsMenuOpen(true)} className="fixed top-5 right-6 z-30 p-2.5 bg-slate-900/80 backdrop-blur-md rounded-full shadow-lg border border-slate-700 hover:bg-slate-800 transition-all text-slate-300 hover:text-white"><MenuIcon size={24} /></button>
       )}
 
       {currentUser && (
         <Menu 
-          isOpen={isMenuOpen} 
-          onClose={() => setIsMenuOpen(false)} 
-          sessions={sessions.filter(s => s.userId === currentUser.id)}
-          currentUser={currentUser}
+          isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)} sessions={sessions.filter(s => s.userId === currentUser.id)} currentUser={currentUser}
           onLoadSession={(s) => { setCurrentSessionId(s.id); setHistory(s.history); setSnapshot(s.snapshot); setState(s.snapshot ? AppState.INSIGHT : AppState.DISCOVERY); setIsMenuOpen(false); }}
           onRenameSession={(id, label) => setSessions(prev => prev.map(s => s.id === id ? { ...s, label } : s))}
           onNewSession={() => { setCurrentSessionId(null); setHistory([]); setSnapshot(null); setState(AppState.ENTRY); setIsMenuOpen(false); }}
@@ -264,20 +280,16 @@ const App: React.FC = () => {
           data={snapshot} currentLabel={sessionLabel} onRename={(l) => setSessionLabel(l)}
           onNext={() => setState(AppState.MATCHING)} onBack={() => setState(AppState.DISCOVERY)}
           mood={userMood} setMood={setUserMood} priority={userPriority} setPriority={setUserPriority} notes={userNotes} setNotes={setUserNotes}
+          onUpdateReport={handleUpdateReport} 
+          hiddenFields={currentSession?.hiddenSnapshotFields || []}
+          editedSnapshot={currentSession?.editedSnapshot}
         />
       )}
 
-      {state === AppState.MATCHING && snapshot && (
-        <State3_5Matching snapshot={snapshot} onFinish={() => setState(AppState.MARKETPLACE)} />
-      )}
+      {state === AppState.MATCHING && snapshot && <State3_5Matching snapshot={snapshot} onFinish={() => setState(AppState.MARKETPLACE)} />}
 
       {state === AppState.MARKETPLACE && snapshot && (
-        <State4Marketplace 
-          snapshot={snapshot}
-          customMentors={activeMentors}
-          onSelectMentor={(m) => { setSelectedMentor(m); setState(AppState.MENTOR_PROFILE); }}
-          onBack={() => setState(AppState.INSIGHT)}
-        />
+        <State4Marketplace snapshot={snapshot} customMentors={activeMentors} onSelectMentor={(m) => { setSelectedMentor(m); setState(AppState.MENTOR_PROFILE); }} onBack={() => setState(AppState.INSIGHT)} />
       )}
 
       {state === AppState.MENTOR_PROFILE && selectedMentor && snapshot && (
@@ -286,18 +298,20 @@ const App: React.FC = () => {
 
       {state === AppState.CONNECTION && snapshot && selectedMentor && (
         <>
-          <State5Workspace snapshot={snapshot} mentor={selectedMentor} onBookSession={() => setShowBooking(true)} onBack={() => setState(AppState.MENTOR_PROFILE)} />
+          <State5Workspace 
+            snapshot={snapshot} 
+            mentor={selectedMentor} 
+            onBookSession={() => setShowBooking(true)} 
+            onBack={() => setState(AppState.MENTOR_PROFILE)} 
+            sessionData={currentSession}
+            onSendMessage={handleSendCollaborationMessage}
+          />
           {showBooking && <State6Booking mentor={selectedMentor} existingSessions={sessions} onClose={() => setShowBooking(false)} onComplete={(t, c) => { setShowBooking(false); if (currentSessionId) setSessions(prev => prev.map(s => s.id === currentSessionId ? { ...s, bookedTime: t, consentGiven: c } : s)); }} />}
         </>
       )}
 
       {state === AppState.APPOINTMENT_DETAILS && currentSessionId && sessions.find(s => s.id === currentSessionId) && (
-        <State7AppointmentDetails 
-          session={sessions.find(s => s.id === currentSessionId)!} 
-          onBack={() => setState(AppState.INSIGHT)} 
-          onReschedule={(t, c) => setSessions(prev => prev.map(s => s.id === currentSessionId ? { ...s, bookedTime: t, consentGiven: c } : s))} 
-          allSessions={sessions} 
-        />
+        <State7AppointmentDetails session={sessions.find(s => s.id === currentSessionId)!} onBack={() => setState(AppState.USER_DASHBOARD)} onReschedule={(t, c) => setSessions(prev => prev.map(s => s.id === currentSessionId ? { ...s, bookedTime: t, consentGiven: c } : s))} allSessions={sessions} />
       )}
 
       {state === AppState.MENTOR_DASHBOARD && currentUser && (
@@ -306,10 +320,9 @@ const App: React.FC = () => {
 
       {state === AppState.USER_DASHBOARD && currentUser && (
         <UserDashboard 
-          user={currentUser} 
-          sessions={sessions.filter(s => s.userId === currentUser.id)} 
-          onUpdateUser={handleUpdateUser}
-          onViewSession={(s) => { setCurrentSessionId(s.id); setHistory(s.history); setSnapshot(s.snapshot); setState(AppState.INSIGHT); }}
+          user={currentUser} sessions={sessions.filter(s => s.userId === currentUser.id)} onUpdateUser={handleUpdateUser}
+          onViewSession={(s) => { setCurrentSessionId(s.id); setHistory(s.history); setSnapshot(s.snapshot); setState(AppState.CONNECTION); }}
+          onViewAppointment={(s) => { setCurrentSessionId(s.id); setHistory(s.history); setSnapshot(s.snapshot); setState(AppState.APPOINTMENT_DETAILS); }}
           onBack={() => setState(AppState.LANDING)} 
         />
       )}

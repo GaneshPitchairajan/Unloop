@@ -54,7 +54,6 @@ const Menu: React.FC<Props> = ({
             </button>
           </div>
 
-          {/* User Profile Info Area */}
           <button 
             onClick={onOpenUserDashboard}
             className="flex items-center gap-4 mb-8 p-4 bg-slate-950 rounded-2xl border border-slate-800 group hover:border-indigo-500/50 transition-all text-left"
@@ -72,7 +71,6 @@ const Menu: React.FC<Props> = ({
           </button>
 
           <div className="flex-1 overflow-y-auto space-y-8 no-scrollbar">
-            {/* Main Action */}
             <button 
               onClick={onNewSession}
               className="w-full py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-medium shadow-lg shadow-indigo-900/40 transition-all flex items-center justify-center gap-2 mb-2"
@@ -81,7 +79,6 @@ const Menu: React.FC<Props> = ({
               <span>New Conversation</span>
             </button>
 
-            {/* Mentor Hub Access */}
             <div className="p-1 bg-slate-950 rounded-xl border border-slate-800">
                <button 
                 onClick={onOpenMentorDashboard}
@@ -95,10 +92,9 @@ const Menu: React.FC<Props> = ({
                </button>
             </div>
 
-            {/* Problems List */}
             <div>
               <h3 className="text-xs font-bold uppercase tracking-widest text-slate-500 mb-4 flex items-center gap-2">
-                <FileText size={14} /> Your Untangling History
+                <FileText size={14} /> Your Unlooped History
               </h3>
               <div className="space-y-3">
                 {sessions.length === 0 ? (
@@ -142,7 +138,6 @@ const Menu: React.FC<Props> = ({
               </div>
             </div>
 
-            {/* Appointments */}
             <div>
               <h3 className="text-xs font-bold uppercase tracking-widest text-slate-500 mb-4 flex items-center gap-2">
                 <Calendar size={14} /> Upcoming Sessions

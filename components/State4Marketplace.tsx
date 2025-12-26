@@ -1,7 +1,7 @@
 
 import React, { useState, useMemo } from 'react';
 import { LifeSnapshot, Mentor, MentorCategory } from '../types';
-import { ArrowRight, Star, ArrowLeft, Filter, Sparkles, Heart, Zap, Shield, Briefcase, Activity, GraduationCap, Users, Brain, TrendingUp, Handshake } from 'lucide-react';
+import { ArrowRight, Star, ArrowLeft, Filter, Sparkles, Heart, Zap, Shield, Briefcase, Activity, GraduationCap, Users, Brain, TrendingUp, Handshake, ChevronDown } from 'lucide-react';
 
 interface Props {
   snapshot: LifeSnapshot;
@@ -10,7 +10,7 @@ interface Props {
   onBack: () => void;
 }
 
-const CATEGORIES: MentorCategory[] = [
+const ALL_CATEGORIES: MentorCategory[] = [
   'Career Guidance', 
   'Mental Health & Well-Being', 
   'Relationship Advice', 
@@ -25,8 +25,9 @@ const CATEGORIES: MentorCategory[] = [
 
 const State4Marketplace: React.FC<Props> = ({ snapshot, customMentors = [], onSelectMentor, onBack }) => {
   const [filter, setFilter] = useState<MentorCategory | 'All'>('All');
+  const [showAllCategories, setShowAllCategories] = useState(false);
 
-  const recommendedCategory = useMemo(() => {
+  const matchedCategory = useMemo(() => {
     const text = (snapshot.primary_theme + " " + snapshot.the_bottleneck).toLowerCase();
     if (text.includes("work") || text.includes("career") || text.includes("job")) return 'Career Guidance';
     if (text.includes("feel") || text.includes("anxious") || text.includes("burnout") || text.includes("mental")) return 'Mental Health & Well-Being';
@@ -35,6 +36,17 @@ const State4Marketplace: React.FC<Props> = ({ snapshot, customMentors = [], onSe
     if (text.includes("study") || text.includes("exam") || text.includes("school")) return 'Academic / Exam Stress';
     return 'General Listening / Peer Support';
   }, [snapshot]);
+
+  // Priority categories: Matched + a few related
+  const relatedCategories = useMemo(() => {
+    const base = [matchedCategory];
+    if (matchedCategory === 'Career Guidance') base.push('Workplace Issues', 'Life Coaching');
+    if (matchedCategory === 'Mental Health & Well-Being') base.push('General Listening / Peer Support', 'Life Coaching');
+    if (matchedCategory === 'Startup / Entrepreneurship') base.push('Career Guidance', 'Financial Guidance');
+    return Array.from(new Set(base));
+  }, [matchedCategory]);
+
+  const displayedCategories = showAllCategories ? ALL_CATEGORIES : relatedCategories;
 
   const allAvailableMentors = useMemo(() => {
     return customMentors;
@@ -69,35 +81,47 @@ const State4Marketplace: React.FC<Props> = ({ snapshot, customMentors = [], onSe
             <div>
               <h2 className="text-4xl font-semibold tracking-tight">Expertise Pools</h2>
               <p className="text-slate-400 mt-2 text-lg font-light max-w-xl">
-                Matched categories based on your bottleneck: <span className="text-indigo-400 font-bold">"{recommendedCategory}"</span>
+                We've prioritized guides who specialize in <span className="text-indigo-400 font-bold">"{matchedCategory}"</span> to help with your bottleneck.
               </p>
             </div>
           </div>
         </header>
 
         {/* Filter Section */}
-        <div className="mb-10 flex flex-wrap gap-2">
-           <button
-             onClick={() => setFilter('All')}
-             className={`px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all border ${
-               filter === 'All' ? 'bg-indigo-600 border-indigo-500 text-white shadow-lg' : 'bg-slate-900 border-slate-800 text-slate-500 hover:text-slate-300'
-             }`}
-           >
-             All
-           </button>
-           {CATEGORIES.map((cat) => (
-             <button
-               key={cat}
-               onClick={() => setFilter(cat)}
-               className={`px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all border flex items-center gap-2 ${
-                 filter === cat ? 'bg-indigo-600 border-indigo-500 text-white shadow-lg' : 'bg-slate-900 border-slate-800 text-slate-500 hover:text-slate-300'
-               } ${cat === recommendedCategory && filter !== cat ? 'ring-2 ring-indigo-500/50' : ''}`}
-             >
-               {getCategoryIcon(cat)}
-               {cat}
-               {cat === recommendedCategory && filter !== cat && <Sparkles size={10} className="text-indigo-400" />}
-             </button>
-           ))}
+        <div className="mb-10 space-y-4">
+           <div className="flex flex-wrap gap-2">
+              <button
+                onClick={() => setFilter('All')}
+                className={`px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all border ${
+                  filter === 'All' ? 'bg-indigo-600 border-indigo-500 text-white shadow-lg' : 'bg-slate-900 border-slate-800 text-slate-500 hover:text-slate-300'
+                }`}
+              >
+                All Recommendations
+              </button>
+              {displayedCategories.map((cat) => (
+                <button
+                  key={cat}
+                  onClick={() => setFilter(cat)}
+                  className={`px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all border flex items-center gap-2 ${
+                    filter === cat ? 'bg-indigo-600 border-indigo-500 text-white shadow-lg' : 'bg-slate-900 border-slate-800 text-slate-500 hover:text-slate-300'
+                  } ${cat === matchedCategory ? 'ring-2 ring-indigo-500/50 border-indigo-500' : ''}`}
+                >
+                  {getCategoryIcon(cat)}
+                  {cat}
+                  {cat === matchedCategory && <Sparkles size={10} className="text-indigo-400" />}
+                </button>
+              ))}
+              
+              {!showAllCategories && (
+                <button
+                  onClick={() => setShowAllCategories(true)}
+                  className="px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider text-slate-600 hover:text-indigo-400 transition-colors flex items-center gap-2"
+                >
+                  <ChevronDown size={14} />
+                  Explore All Categories
+                </button>
+              )}
+           </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -106,11 +130,11 @@ const State4Marketplace: React.FC<Props> = ({ snapshot, customMentors = [], onSe
               key={mentor.id}
               onClick={() => onSelectMentor(mentor)}
               className={`group relative p-6 rounded-3xl transition-all duration-300 cursor-pointer border flex flex-col h-full overflow-hidden
-                ${mentor.category === recommendedCategory 
+                ${mentor.category === matchedCategory 
                   ? 'bg-indigo-950/30 border-indigo-500/50 shadow-xl shadow-indigo-900/10' 
                   : 'bg-slate-900 border-slate-800 hover:border-slate-700 hover:bg-slate-850 shadow-sm'}`}
             >
-              {mentor.category === recommendedCategory && (
+              {mentor.category === matchedCategory && (
                 <div className="absolute top-0 right-0 p-3 bg-indigo-500 rounded-bl-2xl text-white z-10">
                   <Sparkles size={16} fill="currentColor" />
                 </div>
@@ -118,7 +142,7 @@ const State4Marketplace: React.FC<Props> = ({ snapshot, customMentors = [], onSe
 
               <div className="flex items-start gap-4 mb-6">
                 <div className={`w-14 h-14 rounded-2xl flex items-center justify-center font-bold text-xl flex-shrink-0
-                  ${mentor.category === recommendedCategory ? 'bg-indigo-600 text-white' : 'bg-slate-800 text-slate-400'}`}>
+                  ${mentor.category === matchedCategory ? 'bg-indigo-600 text-white' : 'bg-slate-800 text-slate-400'}`}>
                   {mentor.name.charAt(0)}
                 </div>
                 <div>
@@ -138,10 +162,6 @@ const State4Marketplace: React.FC<Props> = ({ snapshot, customMentors = [], onSe
                  <div className="flex items-center justify-between text-xs">
                     <span className="text-slate-500 font-medium">Expertise</span>
                     <span className="text-slate-300 font-bold truncate ml-2">{mentor.specialty}</span>
-                 </div>
-                 <div className="flex items-center justify-between text-xs">
-                    <span className="text-slate-500 font-medium">Availability</span>
-                    <span className="text-emerald-500 font-bold">{mentor.availability}</span>
                  </div>
                  <div className="flex items-center justify-between">
                     <div className="flex items-center gap-1 text-yellow-400">

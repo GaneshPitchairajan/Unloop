@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { Send, Sparkles, Activity, Mic, ArrowRight, Edit3, MessageSquare, X } from 'lucide-react';
 import { Message } from '../types';
@@ -97,7 +98,6 @@ const State2Discovery: React.FC<Props> = ({ chatHistory, onSendMessage, onTransi
 
   const handleManualTyping = () => {
     setShowOptions(false);
-    // Focus input logic would go here normally
   };
 
   // --- Live API Implementation ---
@@ -296,13 +296,13 @@ const State2Discovery: React.FC<Props> = ({ chatHistory, onSendMessage, onTransi
                   className="flex-1 md:flex-none px-6 py-3 bg-slate-800 border border-slate-700 text-slate-300 font-medium rounded-xl hover:bg-slate-700 hover:border-slate-600 transition-all flex items-center justify-center gap-2"
                 >
                   <MessageSquare size={16} />
-                  <span>Keep talking</span>
+                  <span>Unloop & Talk</span>
                 </button>
                 <button 
                   onClick={onTransition}
                   className="flex-1 md:flex-none px-8 py-3 bg-indigo-600 text-white font-medium rounded-xl hover:bg-indigo-500 shadow-lg shadow-indigo-900/40 transition-all flex items-center justify-center gap-2 transform hover:scale-105"
                 >
-                  <span>See what we noticed</span>
+                  <span>UNLOOP Your Problem</span>
                   <ArrowRight size={18} />
                 </button>
               </div>

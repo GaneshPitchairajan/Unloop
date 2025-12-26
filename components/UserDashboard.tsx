@@ -1,17 +1,18 @@
 
 import React, { useState } from 'react';
-import { User, SessionData } from '../types';
-import { ArrowLeft, User as UserIcon, Mail, Phone, FileText, CheckCircle, Clock, Heart, Edit3, Save, MessageSquare, ChevronRight } from 'lucide-react';
+import { User, SessionData, AppState } from '../types';
+import { ArrowLeft, User as UserIcon, Mail, Phone, FileText, CheckCircle, Clock, Heart, Edit3, Save, MessageSquare, ChevronRight, Calendar } from 'lucide-react';
 
 interface Props {
   user: User;
   sessions: SessionData[];
   onUpdateUser: (updatedUser: User) => void;
   onViewSession: (session: SessionData) => void;
+  onViewAppointment: (session: SessionData) => void;
   onBack: () => void;
 }
 
-const UserDashboard: React.FC<Props> = ({ user, sessions, onUpdateUser, onViewSession, onBack }) => {
+const UserDashboard: React.FC<Props> = ({ user, sessions, onUpdateUser, onViewSession, onViewAppointment, onBack }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
     name: user.name,
@@ -32,6 +33,21 @@ const UserDashboard: React.FC<Props> = ({ user, sessions, onUpdateUser, onViewSe
     setIsEditing(false);
   };
 
+  const handleMentorClick = (mentorId: string) => {
+    // Find the latest session with this mentor
+    const lastSession = sessions
+      .filter(s => s.selectedMentor?.id === mentorId)
+      .sort((a, b) => b.timestamp - a.timestamp)[0];
+    
+    if (lastSession) {
+      if (lastSession.bookedTime) {
+        onViewAppointment(lastSession);
+      } else {
+        onViewSession(lastSession);
+      }
+    }
+  };
+
   return (
     <div className="min-h-screen bg-slate-950 p-6 md:p-12 fade-in text-slate-100 overflow-y-auto">
       <div className="max-w-5xl mx-auto space-y-10">
@@ -41,12 +57,11 @@ const UserDashboard: React.FC<Props> = ({ user, sessions, onUpdateUser, onViewSe
           </button>
           <div>
             <h1 className="text-3xl font-bold tracking-tight">Your Profile & Dashboard</h1>
-            <p className="text-slate-400 font-light mt-1">Manage your identity and track your untangling progress.</p>
+            <p className="text-slate-400 font-light mt-1">Manage your identity and progress.</p>
           </div>
         </header>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Profile Section */}
           <div className="lg:col-span-1 space-y-6">
             <div className="bg-slate-900 p-8 rounded-3xl border border-slate-800 flex flex-col items-center text-center space-y-4">
               <div className="relative group">
@@ -68,21 +83,15 @@ const UserDashboard: React.FC<Props> = ({ user, sessions, onUpdateUser, onViewSe
                       <input value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm focus:border-indigo-500 outline-none" />
                     </div>
                     <div className="space-y-1">
-                      <label className="text-[10px] uppercase font-bold text-slate-500">Email</label>
-                      <input value={formData.email} disabled className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm opacity-50 cursor-not-allowed" />
-                    </div>
-                    <div className="space-y-1">
                       <label className="text-[10px] uppercase font-bold text-slate-500">Phone</label>
-                      <input value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm focus:border-indigo-500 outline-none" placeholder="+1..." />
+                      <input value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm focus:border-indigo-500 outline-none" />
                     </div>
                     <div className="space-y-1">
                       <label className="text-[10px] uppercase font-bold text-slate-500">Bio</label>
-                      <textarea value={formData.bio} onChange={e => setFormData({...formData, bio: e.target.value})} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm h-24 resize-none focus:border-indigo-500 outline-none" placeholder="A little about yourself..." />
+                      <textarea value={formData.bio} onChange={e => setFormData({...formData, bio: e.target.value})} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm h-24 resize-none focus:border-indigo-500 outline-none" />
                     </div>
                     <div className="flex gap-2">
-                      <button onClick={handleSave} className="flex-1 py-2 bg-indigo-600 text-white rounded-xl text-sm font-bold flex items-center justify-center gap-2">
-                        <Save size={14} /> Save
-                      </button>
+                      <button onClick={handleSave} className="flex-1 py-2 bg-indigo-600 text-white rounded-xl text-sm font-bold flex items-center justify-center gap-2"><Save size={14} /> Save</button>
                       <button onClick={() => setIsEditing(false)} className="px-4 py-2 bg-slate-800 text-slate-400 rounded-xl text-sm font-bold">Cancel</button>
                     </div>
                   </div>
@@ -90,7 +99,7 @@ const UserDashboard: React.FC<Props> = ({ user, sessions, onUpdateUser, onViewSe
                   <>
                     <div>
                       <h3 className="text-xl font-bold">{user.name}</h3>
-                      <p className="text-slate-500 text-sm">{user.email}</p>
+                      <p className="text-slate-500 text-sm flex items-center justify-center gap-2"><Mail size={12} /> {user.email}</p>
                     </div>
                     <div className="flex flex-col gap-3 pt-4 text-sm text-slate-400">
                       <div className="flex items-center gap-3">
@@ -106,7 +115,6 @@ const UserDashboard: React.FC<Props> = ({ user, sessions, onUpdateUser, onViewSe
               </div>
             </div>
 
-            {/* Mentors Section */}
             <div className="bg-slate-900 p-6 rounded-3xl border border-slate-800">
               <h3 className="text-xs font-bold uppercase tracking-widest text-slate-500 mb-6 flex items-center gap-2">
                 <Heart size={14} className="text-rose-400" /> Your Guides
@@ -116,10 +124,12 @@ const UserDashboard: React.FC<Props> = ({ user, sessions, onUpdateUser, onViewSe
                   <p className="text-xs text-slate-600 italic">No mentors connected yet.</p>
                 ) : (
                   contactedMentors.map(m => (
-                    <div key={m.id} className="flex items-center gap-3 p-3 bg-slate-950 rounded-2xl border border-slate-800 group hover:border-indigo-500/50 transition-all cursor-pointer">
-                      <div className="w-10 h-10 bg-indigo-900 text-indigo-300 rounded-xl flex items-center justify-center font-bold">
-                        {m.name.charAt(0)}
-                      </div>
+                    <div 
+                      key={m.id} 
+                      onClick={() => handleMentorClick(m.id)}
+                      className="flex items-center gap-3 p-3 bg-slate-950 rounded-2xl border border-slate-800 group hover:border-indigo-500/50 transition-all cursor-pointer"
+                    >
+                      <div className="w-10 h-10 bg-indigo-900 text-indigo-300 rounded-xl flex items-center justify-center font-bold">{m.name.charAt(0)}</div>
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-bold truncate">{m.name}</p>
                         <p className="text-[10px] text-slate-500 uppercase tracking-widest font-bold">{m.type}</p>
@@ -132,9 +142,7 @@ const UserDashboard: React.FC<Props> = ({ user, sessions, onUpdateUser, onViewSe
             </div>
           </div>
 
-          {/* Sessions/Problems Section */}
           <div className="lg:col-span-2 space-y-8">
-            {/* Open Problems */}
             <div className="bg-slate-900 p-8 rounded-3xl border border-slate-800">
               <div className="flex justify-between items-center mb-6">
                 <h3 className="text-lg font-bold flex items-center gap-2">
@@ -146,14 +154,12 @@ const UserDashboard: React.FC<Props> = ({ user, sessions, onUpdateUser, onViewSe
               </div>
               <div className="space-y-4">
                 {openSessions.length === 0 ? (
-                  <p className="text-sm text-slate-500 text-center py-8 italic border-2 border-dashed border-slate-800 rounded-2xl">
-                    No active problems currently untangling.
-                  </p>
+                  <p className="text-sm text-slate-500 text-center py-8 italic border-2 border-dashed border-slate-800 rounded-2xl">No active problems.</p>
                 ) : (
                   openSessions.map(s => (
                     <div 
                       key={s.id} 
-                      onClick={() => onViewSession(s)}
+                      onClick={() => s.bookedTime ? onViewAppointment(s) : onViewSession(s)}
                       className="p-5 bg-slate-950 border border-slate-800 rounded-2xl flex items-center gap-4 hover:bg-slate-900/50 hover:border-indigo-500/30 cursor-pointer transition-all group"
                     >
                       <div className="flex-1">
@@ -162,42 +168,11 @@ const UserDashboard: React.FC<Props> = ({ user, sessions, onUpdateUser, onViewSe
                       </div>
                       {s.bookedTime && (
                         <div className="text-right">
-                          <p className="text-[10px] font-bold text-emerald-400 uppercase">Booked Session</p>
+                          <p className="text-[10px] font-bold text-emerald-400 uppercase flex items-center gap-1 justify-end"><Calendar size={10}/> Scheduled</p>
                           <p className="text-xs text-slate-400">{s.bookedTime}</p>
                         </div>
                       )}
                       <ChevronRight size={16} className="text-slate-700 group-hover:text-indigo-400" />
-                    </div>
-                  ))
-                )}
-              </div>
-            </div>
-
-            {/* Resolved Problems */}
-            <div className="bg-slate-900 p-8 rounded-3xl border border-slate-800">
-              <div className="flex justify-between items-center mb-6">
-                <h3 className="text-lg font-bold flex items-center gap-2">
-                  <CheckCircle className="text-emerald-400" size={20} /> Resolved Problems
-                </h3>
-                <span className="px-3 py-1 bg-emerald-900/20 text-emerald-400 text-[10px] font-bold uppercase rounded-full border border-emerald-900/30">
-                  {resolvedSessions.length} Total
-                </span>
-              </div>
-              <div className="space-y-4">
-                {resolvedSessions.length === 0 ? (
-                  <p className="text-sm text-slate-500 text-center py-8 italic">No problems archived as resolved yet.</p>
-                ) : (
-                  resolvedSessions.map(s => (
-                    <div 
-                      key={s.id} 
-                      onClick={() => onViewSession(s)}
-                      className="p-4 bg-slate-950/50 border border-slate-800/50 rounded-2xl flex items-center gap-4 opacity-75 hover:opacity-100 hover:bg-slate-950 cursor-pointer transition-all"
-                    >
-                      <CheckCircle className="text-emerald-500/50" size={16} />
-                      <div className="flex-1">
-                        <p className="font-bold text-slate-400 text-sm">{s.label}</p>
-                        <p className="text-[10px] text-slate-600 mt-0.5">Resolved on {new Date(s.timestamp).toLocaleDateString()}</p>
-                      </div>
                     </div>
                   ))
                 )}

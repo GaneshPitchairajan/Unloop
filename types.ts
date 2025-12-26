@@ -19,7 +19,7 @@ export enum AppState {
 
 export interface Message {
   id: string;
-  role: 'user' | 'model' | 'system';
+  role: 'user' | 'model' | 'system' | 'mentor';
   content: string;
   timestamp: number;
 }
@@ -39,7 +39,7 @@ export interface LifeSnapshot {
     description: string;
   };
   low_effort_action: string;
-  suggested_activities?: string[]; // Added for self-solve suggestions
+  suggested_activities?: string[];
 }
 
 export interface Review {
@@ -69,6 +69,9 @@ export type MentorCategory =
 export interface Mentor {
   id: string;
   name: string;
+  email?: string;
+  phone?: string;
+  socialLink?: string;
   type: 'Listener' | 'Domain Strategist' | 'Clarity Architect';
   category: MentorCategory;
   tagline: string;
@@ -103,7 +106,11 @@ export interface SessionData {
   timestamp: number;
   label: string; 
   history: Message[];
+  collaborationHistory?: Message[]; // Chat between user and mentor
   snapshot: LifeSnapshot;
+  editedSnapshot?: LifeSnapshot; 
+  hiddenSnapshotFields?: string[]; 
+  editedFields?: string[]; 
   selectedMentor?: Mentor;
   bookedTime?: string;
   userMood?: string;
@@ -111,5 +118,5 @@ export interface SessionData {
   userNotes?: string;
   consentGiven?: boolean;
   status?: SessionStatus;
-  userId?: string; // Track who created the session
+  userId?: string;
 }
